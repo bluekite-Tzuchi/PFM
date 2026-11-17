@@ -166,7 +166,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
 <div class="view" id="view-q">
 
 <section class="panel" aria-label="選擇情境">
-  <div class="panel-head"><h2>一、選擇情境</h2><span class="hint">可複選；同時選多個時取聯集</span></div>
+  <div class="panel-head"><h2>一、選擇情境</h2><span class="hint">單選；按住 Ctrl（Mac 為 ⌘）再點可複選，複選時取聯集</span></div>
   <div>
     <h3>個案主題</h3>
     <div class="chips" id="cases" style="margin-top:8px"></div>
@@ -306,7 +306,7 @@ function setCase(k){
   $('path').innerHTML=D.STAGES.map((s,i)=>`<button type="button" class="step" data-k="${s.k}" aria-pressed="false"><span class="no">${i<7?'階段 '+(i+1):'跨階段'}</span><span class="nm">${esc(s.n)}</span><span class="ds">${esc(s.d)}</span></button>`).join('');
   $('events').innerHTML=D.EVENTS.map(e=>{const n=D.Q.filter(q=>matchEvent(q,e)).length;return n?`<button type="button" class="chip" data-k="ev:${e.k}" aria-pressed="false">${esc(e.n)}<span class="n">${n}</span></button>`:''}).join('');
   $('role').innerHTML='<option value="">全部人員</option>'+[...new Set(D.Q.map(q=>q.role))].map(r=>`<option>${esc(r)}</option>`).join('');
-  document.querySelectorAll('#path .step,#events .chip').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.k;state.sel.has(k)?state.sel.delete(k):state.sel.add(k);state.focus=null;render()}));
+  document.querySelectorAll('#path .step,#events .chip').forEach(b=>b.addEventListener('click',ev=>{const k=b.dataset.k;if(ev.ctrlKey||ev.metaKey){state.sel.has(k)?state.sel.delete(k):state.sel.add(k)}else{const only=state.sel.size===1&&state.sel.has(k);state.sel.clear();if(!only)state.sel.add(k)}state.focus=null;render()}));
   state.sel=new Set([D.STAGES[0].k]);state.role='';state.kw='';state.focus=null;$('kw').value='';
   if(typeof ps!=='undefined'){ps.ind=null;$('spcpanel').hidden=true}
   render();
