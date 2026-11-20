@@ -52,6 +52,10 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .chip[aria-pressed="true"] .n{color:var(--accent-ink);opacity:.85}
 .tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.roles{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin-top:10px;font-size:13px}
+.roles:empty{display:none}
+.roles .lab{color:var(--muted);margin-right:2px}
+.roles .chip{padding:3px 10px;font-size:13px}
 .tools label{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
 select,input[type=search]{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 10px}
 input[type=search]{min-width:200px}
@@ -193,6 +197,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
     <button class="btn" id="allstages" type="button">選取全部階段</button>
     <button class="btn" id="clear" type="button">清除選擇</button>
   </div>
+  <div class="roles" id="roles"></div>
 </section>
 
 <div class="summary" aria-live="polite">
@@ -364,9 +369,19 @@ function renderEvents(qs){
     state.focus=null;render();
   }));
 }
+function renderRoles(){
+  // 已選情境（含關鍵字，不含人員篩選）內可直接受訪的人員與題數
+  let base=baseSet();
+  if(state.kw){const k=state.kw.toLowerCase();base=base.filter(q=>(q.id+q.q+q.ct+q.e+q.i.join(' ')+q.role+q.refs.map(r=>r[1].map(x=>D.FULL[x[1]]).join(' ')).join(' ')).toLowerCase().includes(k))}
+  if(!base.length){$('roles').innerHTML='';return}
+  const cnt=new Map();base.forEach(q=>cnt.set(q.role,(cnt.get(q.role)||0)+1));
+  $('roles').innerHTML=`<span class="lab">可受訪人員（${cnt.size} 類）：</span>`+[...cnt].map(([r,n])=>`<button type="button" class="chip" data-r="${esc(r)}" aria-pressed="${state.role===r}">${esc(r)}<span class="n">${n} 題</span></button>`).join('');
+  document.querySelectorAll('#roles .chip').forEach(b=>b.addEventListener('click',()=>{const r=b.dataset.r;state.role=state.role===r?'':r;$('role').value=state.role;state.focus=null;render()}));
+}
 function render(){
   document.querySelectorAll('#path .step').forEach(b=>b.setAttribute('aria-pressed',state.sel.has(b.dataset.k)));
   const qs=filtered();
+  renderRoles();
   renderEvents(qs);
   // 條文
   const cCount={};qs.forEach(q=>q.c.forEach(c=>cCount[c]=(cCount[c]||0)+1));
