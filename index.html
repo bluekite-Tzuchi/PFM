@@ -63,6 +63,11 @@ input[type=search]{min-width:200px}
 .stat{display:flex;align-items:baseline;gap:6px;font-size:13px;color:var(--muted)}
 .stat b{font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums;font-family:var(--display)}
 .focus{display:inline-flex;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--accent);border-radius:999px;padding:3px 6px 3px 12px;font-size:13px}
+.evhint{font-weight:400;font-size:12.5px;color:var(--muted);margin-left:10px}
+.chip.zero{opacity:.38;cursor:default}
+.chip.zero:hover{border-color:var(--line)}
+.chip.none{border-style:dashed}
+.evtag{display:inline-block;background:var(--accent-soft);color:var(--ink);border-radius:6px;padding:1px 8px;margin:0 6px 4px 0;font-size:12.5px}
 .focus button{border:0;background:var(--sunken);border-radius:999px;width:22px;height:22px;line-height:1;padding:0}
 .two{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px;align-items:start}
 /* 條文 */
@@ -177,7 +182,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
     <div class="path" id="path" style="margin-top:8px"></div>
   </div>
   <div>
-    <h3>依醫療事件</h3>
+    <h3>依醫療事件<span class="evhint" id="evhint"></span></h3>
     <div class="chips" id="events" style="margin-top:8px"></div>
   </div>
   <div class="tools">
@@ -290,6 +295,9 @@ const cOrder=Object.keys(D.C);
 D.EVENTS.forEach(e=>{e.rx=e.re?new RegExp(e.re):null});
 function matchEvent(q,e){return e.c.some(c=>q.c.includes(c))||(e.rx&&e.rx.test(q.q))||e.i.some(i=>q.i.includes(i))}
 const state={sel:new Set(),role:'',kw:'',focus:null};
+function qEvents(q){return D.EVENTS.filter(e=>matchEvent(q,e))}
+function focusMatch(q,f){if(f.t==='c')return q.c.includes(f.v);if(f.t==='i')return q.i.includes(f.v);if(f.t==='e'){if(f.v==='__none')return !qEvents(q).length;return matchEvent(q,D.EVENTS.find(e=>e.k===f.v))}return true}
+function focusLabel(f){if(f.t==='c')return '條文 '+f.v;if(f.t==='e')return f.v==='__none'?'未歸類醫療事件':'醫療事件：'+D.EVENTS.find(e=>e.k===f.v).n;return f.v}
 
 function refsHTML(q){return q.refs.map(([c,items])=>`<div class="ref"><div class="rc"><b>${c}</b>　${esc(D.C[c].t)}${D.C[c].tags.includes('重')?'<span class="badge key">重點條文</span>':''}${D.C[c].tags.includes('試')?'<span class="badge">試評條文</span>':''}</div><ul>${items.map(([lab,key])=>`<li><span class="rl">${esc(lab)}</span>${esc(D.FULL[key])}</li>`).join('')}</ul></div>`).join('')}
 function refsText(q){return q.refs.map(([c,items])=>`${c} ${D.C[c].t}\n`+items.map(([lab,key])=>`　　・${lab}：${D.FULL[key]}`).join('\n')).join('\n　')}
@@ -313,9 +321,8 @@ function setCase(k){
   document.querySelectorAll('.casetab').forEach(b=>b.setAttribute('aria-pressed',b.dataset.c===CASE.k));
   $('caseintro').textContent=CASE.intro+'（共 '+D.Q.length+' 題）';
   $('path').innerHTML=D.STAGES.map((s,i)=>`<button type="button" class="step" data-k="${s.k}" aria-pressed="false"><span class="no">${i<7?'階段 '+(i+1):'跨階段'}</span><span class="nm">${esc(s.n)}</span><span class="ds">${esc(s.d)}</span></button>`).join('');
-  $('events').innerHTML=D.EVENTS.map(e=>{const n=D.Q.filter(q=>matchEvent(q,e)).length;return n?`<button type="button" class="chip" data-k="ev:${e.k}" aria-pressed="false">${esc(e.n)}<span class="n">${n}</span></button>`:''}).join('');
   $('role').innerHTML='<option value="">全部人員</option>'+[...new Set(D.Q.map(q=>q.role))].map(r=>`<option>${esc(r)}</option>`).join('');
-  document.querySelectorAll('#path .step,#events .chip').forEach(b=>b.addEventListener('click',ev=>{const k=b.dataset.k;if(ev.ctrlKey||ev.metaKey){state.sel.has(k)?state.sel.delete(k):state.sel.add(k)}else{const only=state.sel.size===1&&state.sel.has(k);state.sel.clear();if(!only)state.sel.add(k)}state.focus=null;render()}));
+  document.querySelectorAll('#path .step').forEach(b=>b.addEventListener('click',ev=>{const k=b.dataset.k;if(ev.ctrlKey||ev.metaKey){state.sel.has(k)?state.sel.delete(k):state.sel.add(k)}else{const only=state.sel.size===1&&state.sel.has(k);state.sel.clear();if(!only)state.sel.add(k)}state.focus=null;render()}));
   state.sel=new Set([D.STAGES[0].k]);state.role='';state.kw='';state.focus=null;$('kw').value='';
   if(typeof ps!=='undefined'){ps.ind=null;$('spcpanel').hidden=true}
   render();
@@ -329,9 +336,38 @@ function build(){
   $('allstages').addEventListener('click',()=>{D.STAGES.forEach(s=>state.sel.add(s.k));render()});
   $('copy').addEventListener('click',copyList);
 }
+function renderEvents(qs){
+  const stageMode=[...state.sel].some(k=>stageByKey[k]);
+  const fe=v=>!!(state.focus&&state.focus.t==='e'&&state.focus.v===v);
+  const all=D.EVENTS.map(e=>({e,tot:D.Q.filter(q=>matchEvent(q,e)).length})).filter(x=>x.tot);
+  let html;
+  if(stageMode){
+    const nNone=qs.filter(q=>!qEvents(q).length).length;
+    html=all.map(({e})=>{const n=qs.filter(q=>matchEvent(q,e)).length,k='ev:'+e.k;
+      return `<button type="button" class="chip${n?'':' zero'}" data-k="${k}" data-e="${e.k}" data-n="${n}" aria-pressed="${state.sel.has(k)||fe(e.k)}">${esc(e.n)}<span class="n">${n}</span></button>`}).join('')
+      +(nNone?`<button type="button" class="chip none" data-e="__none" data-n="${nNone}" aria-pressed="${fe('__none')}">未歸類<span class="n">${nNone}</span></button>`:'');
+    const multi=qs.filter(q=>qEvents(q).length>1).length;
+    $('evhint').textContent=qs.length?`數字為已選情境 ${qs.length} 題中的題數${multi?`（${multi} 題跨多類）`:''}；點選只看該類，Ctrl＋點選加入情境`:'';
+  }else{
+    html=all.map(({e,tot})=>{const k='ev:'+e.k;return `<button type="button" class="chip" data-k="${k}" data-e="${e.k}" aria-pressed="${state.sel.has(k)}">${esc(e.n)}<span class="n">${tot}</span></button>`}).join('');
+    $('evhint').textContent='';
+  }
+  $('events').innerHTML=html;
+  document.querySelectorAll('#events .chip').forEach(b=>b.addEventListener('click',ev=>{
+    const k=b.dataset.k,v=b.dataset.e;
+    if(stageMode&&!(ev.ctrlKey||ev.metaKey)){ // 階段內只看該類
+      if(b.dataset.n==='0')return;
+      state.focus=fe(v)?null:{t:'e',v};render();return;
+    }
+    if(!k)return;
+    if(ev.ctrlKey||ev.metaKey){state.sel.has(k)?state.sel.delete(k):state.sel.add(k)}else{const only=state.sel.size===1&&state.sel.has(k);state.sel.clear();if(!only)state.sel.add(k)}
+    state.focus=null;render();
+  }));
+}
 function render(){
-  document.querySelectorAll('#path .step,#events .chip').forEach(b=>b.setAttribute('aria-pressed',state.sel.has(b.dataset.k)));
+  document.querySelectorAll('#path .step').forEach(b=>b.setAttribute('aria-pressed',state.sel.has(b.dataset.k)));
   const qs=filtered();
+  renderEvents(qs);
   // 條文
   const cCount={};qs.forEach(q=>q.c.forEach(c=>cCount[c]=(cCount[c]||0)+1));
   const cItems={};qs.forEach(q=>q.refs.forEach(([c,its])=>its.forEach(([lab])=>{(cItems[c]=cItems[c]||new Set()).add(lab)})));
@@ -342,13 +378,14 @@ function render(){
   const il=indOrder.filter(i=>iCount[i]||(stageInds.has(i)&&!state.role&&!state.kw));
   // focus
   let shown=qs;
-  if(state.focus){shown=qs.filter(q=>state.focus.t==='c'?q.c.includes(state.focus.v):q.i.includes(state.focus.v));if(!shown.length){state.focus=null;shown=qs}}
+  if(state.focus){shown=qs.filter(q=>focusMatch(q,state.focus));if(!shown.length){state.focus=null;shown=qs}}
   // 摘要
   const names=[...state.sel].map(k=>stageByKey[k]?stageByKey[k].n:D.EVENTS.find(e=>'ev:'+e.k===k).n);
   $('seltext').textContent=names.length?'已選情境：'+names.join('、')+(state.role?'｜'+state.role:''):'尚未選擇情境';
   $('nC').textContent=cl.length;$('nQ').textContent=qs.length;$('nI').textContent=il.length;
-  $('focusbox').innerHTML=state.focus?`<span class="focus">只看：${esc(state.focus.t==='c'?'條文 '+state.focus.v:state.focus.v)}（${shown.length} 題）<button type="button" id="unfocus" aria-label="取消篩選">×</button></span>`:'';
+  $('focusbox').innerHTML=state.focus?`<span class="focus">只看：${esc(focusLabel(state.focus))}（${shown.length} 題）<button type="button" id="unfocus" aria-label="取消篩選">×</button></span>`:'';
   if(state.focus)$('unfocus').addEventListener('click',()=>{state.focus=null;render()});
+
   // 條文清單
   const empty='<p class="empty">請先在上方選擇至少一個階段或事件。</p>';
   const none='<p class="empty">沒有符合條件的內容，請調整受訪人員或關鍵字。</p>';
@@ -369,14 +406,14 @@ function render(){
   // 提問
   if(!shown.length)$('qlist').innerHTML=msg;else{
     const groups=[];shown.forEach(q=>{const key=q.s+'|'+q.role;let g=groups.find(x=>x.key===key);if(!g){g={key,q:[],s:q.s,role:q.role,rc:q.rc};groups.push(g)}g.q.push(q)});
-    $('qlist').innerHTML=groups.map(g=>`<div class="rolegroup"><div class="rolehead"><h3>${esc(g.role)}</h3><span class="stg">${esc(stageByKey[g.s].idx<7?'階段 '+(stageByKey[g.s].idx+1)+'　'+stageByKey[g.s].n:'跨階段')}　${g.q.length} 題</span></div><div>${g.q.map(q=>`<div class="q"><div class="qid">${q.id}</div><div class="qtext">${esc(q.q)}</div><dl class="meta"><dt>條文依據</dt><dd>${refsHTML(q)}</dd><dt>佐證指標</dt><dd>${q.i.length?(q.i.length>8?'七階段全部指標':q.i.map(i=>`<span class="pill ${D.KIND[i]==='過程'?'p':'o'}">${esc(i)}</span>`).join('')):'—'}</dd><dt>佐證資料</dt><dd>${esc(q.e)}</dd></dl></div>`).join('')}</div></div>`).join('');
+    $('qlist').innerHTML=groups.map(g=>`<div class="rolegroup"><div class="rolehead"><h3>${esc(g.role)}</h3><span class="stg">${esc(stageByKey[g.s].idx<7?'階段 '+(stageByKey[g.s].idx+1)+'　'+stageByKey[g.s].n:'跨階段')}　${g.q.length} 題</span></div><div>${g.q.map(q=>`<div class="q"><div class="qid">${q.id}</div><div class="qtext">${esc(q.q)}</div><dl class="meta"><dt>醫療事件</dt><dd>${(()=>{const ev=qEvents(q);return ev.length?ev.map(e=>`<span class="evtag">${esc(e.n)}</span>`).join(''):'<span class="evtag">未歸類</span>'})()}</dd><dt>條文依據</dt><dd>${refsHTML(q)}</dd><dt>佐證指標</dt><dd>${q.i.length?(q.i.length>8?'七階段全部指標':q.i.map(i=>`<span class="pill ${D.KIND[i]==='過程'?'p':'o'}">${esc(i)}</span>`).join('')):'—'}</dd><dt>佐證資料</dt><dd>${esc(q.e)}</dd></dl></div>`).join('')}</div></div>`).join('');
   }
   window.__shown=shown;
 }
 function copyList(){
   const qs=window.__shown||[];const m=$('copymsg');
   if(!qs.length){m.textContent='目前沒有可複製的提問';return}
-  const txt=qs.map(q=>`${q.id}［${q.role}］${q.q}\n　條文依據：${refsText(q)}\n　佐證指標：${q.i.length?q.i.join('、'):'—'}\n　佐證資料：${q.e}`).join('\n\n');
+  const txt=qs.map(q=>`${q.id}［${q.role}］${q.q}\n　醫療事件：${qEvents(q).map(e=>e.n).join('、')||'未歸類'}\n　條文依據：${refsText(q)}\n　佐證指標：${q.i.length?q.i.join('、'):'—'}\n　佐證資料：${q.e}`).join('\n\n');
   try{navigator.clipboard.writeText(txt).then(()=>{m.textContent='已複製 '+qs.length+' 題'},()=>{m.textContent='瀏覽器未允許複製，請手動選取文字'})}catch(e){m.textContent='瀏覽器未允許複製，請手動選取文字'}
 }
 /* ===== 管制圖 ===== */
