@@ -131,6 +131,71 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
 .viewtab{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 16px;font-weight:700}
 .viewtab[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .noref{font-size:13px;color:var(--muted)}
+/* PFM 評分 */
+#statpanel[hidden]{display:none!important}
+.scoreprog{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+#scoremode[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.score{grid-column:2;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin-top:8px;padding:8px 10px;background:var(--sunken);border-radius:8px}
+.score .lab{font-size:12.5px;font-weight:700;margin-right:2px}
+.score button{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:13px;color:var(--ink)}
+.score button:hover{border-color:var(--accent)}
+.score button[aria-pressed="true"][data-lv="符合"]{background:#0ca30c;border-color:#0ca30c;color:#fff}
+.score button[aria-pressed="true"][data-lv="部分符合"]{background:#fab219;border-color:#fab219;color:#0b0b0b}
+.score button[aria-pressed="true"][data-lv="不符合"]{background:#d03b3b;border-color:#d03b3b;color:#fff}
+.score button[aria-pressed="true"][data-lv="不適用"]{background:var(--muted);border-color:var(--muted);color:var(--bg)}
+.score input{flex:1 1 220px;font:inherit;font-size:13px;border:1px solid var(--line);border-radius:6px;padding:4px 8px;background:var(--surface);color:var(--ink)}
+.q.sc-符合{box-shadow:inset 3px 0 0 #0ca30c}
+.q.sc-部分符合{box-shadow:inset 3px 0 0 #fab219}
+.q.sc-不符合{box-shadow:inset 3px 0 0 #d03b3b}
+.q.sc-不適用{box-shadow:inset 3px 0 0 var(--muted)}
+.q[class*="sc-"]{padding-left:10px}
+.st-meta{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;margin-bottom:12px}
+.st-meta .st-case{font-weight:700}
+.st-meta label{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.st-meta input{font:inherit;font-size:13.5px;border:1px solid var(--line);border-radius:6px;padding:5px 8px;background:var(--surface);color:var(--ink)}
+.st-tiles{display:flex;flex-wrap:wrap;gap:10px 28px;align-items:baseline;margin:14px 0 6px}
+.st-tiles .stat b{font-size:24px;font-variant-numeric:tabular-nums}
+.st-legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted);margin:6px 0 2px}
+.st-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+.st-chart{margin-top:18px}
+.st-chart h3{font-size:14.5px;margin:0 0 6px}
+.st-chart svg{width:100%;height:auto;display:block}
+.st-empty{font-size:13.5px;color:var(--muted);margin:14px 0}
+.st-table{border-collapse:collapse;width:100%;font-size:13px;margin-top:6px}
+.st-table th,.st-table td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.st-table th{background:var(--sunken);font-size:12.5px;white-space:nowrap}
+.st-table .lv{white-space:nowrap;font-weight:700}
+.st-table tr.st-all td{font-weight:700}
+.st-table tr.st-grp td{font-weight:700;background:var(--sunken)}
+.st-table tr.st-sub td:first-child{padding-left:28px}
+.st-bad{table-layout:fixed}
+.st-bad th:nth-child(1){width:88px}.st-bad th:nth-child(2){width:120px}.st-bad th:nth-child(4){width:80px}.st-bad th:nth-child(5){width:200px}
+.st-sub-h{font-size:13.5px;margin:14px 0 4px;padding:4px 8px;background:var(--sunken);border-radius:6px}
+.st-hist{margin-top:26px;border-top:2px solid var(--ink);padding-top:12px}
+.st-hist-head{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.st-hist-head h3{margin:0;font-size:15px}
+.st-hist-btns{margin-left:auto;display:flex;gap:8px}
+.st-hist-btns label.btn{cursor:pointer}
+#h-msg{font-size:13px;color:var(--muted)}
+.st-hist .st-table td.act{white-space:nowrap}
+.st-hist .st-table td.act button{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:2px 10px;font-size:12.5px;color:var(--ink);margin-right:4px}
+.st-hist .st-table td.act button:hover{border-color:var(--accent)}
+.st-hist .st-table tr.cur td{background:var(--accent-soft)}
+.st-hist .num{text-align:right;font-variant-numeric:tabular-nums}
+.st-hist .cmp td,.st-hist .cmp th{text-align:center}
+.st-hist .cmp td:first-child,.st-hist .cmp th:first-child{text-align:left}
+.st-hist .cmp .c3{font-size:12px;color:var(--muted);white-space:nowrap}
+.st-hist .cmp .c3 b{color:var(--ink)}
+.st-viewing{background:var(--key-soft);border-radius:8px;padding:8px 12px;font-size:13.5px;margin:10px 0}
+.st-note{font-size:12.5px;color:var(--muted);margin:14px 0 0;line-height:1.7}
+.st-wrap{overflow-x:auto}
+@media print{
+  body.ps *{visibility:hidden!important}
+  body.ps #statpanel,body.ps #statpanel *{visibility:visible!important}
+  body.ps #statpanel{position:absolute;left:0;top:0;width:100%;border:0;box-shadow:none}
+  body.ps #statpanel .noprint,body.ps #st-reset{display:none!important}
+  body.ps .st-chart,body.ps .st-table tr{break-inside:avoid}
+}
 .view{display:flex;flex-direction:column;gap:20px}
 .view[hidden]{display:none}
 .indrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:stretch}
@@ -232,8 +297,33 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
 
 <section class="panel">
   <div class="panel-head"><h2>四、委員可提問的問題</h2>
-    <span><span id="copymsg" role="status"></span> <button class="btn" id="copy" type="button">複製目前的提問清單</button></span></div>
+    <span><span id="copymsg" role="status"></span> <span class="scoreprog" id="scoreprog"></span> <button class="btn" id="scoremode" type="button" aria-pressed="false">開始評分</button> <button class="btn" id="copy" type="button">複製目前的提問清單</button></span></div>
   <div class="qlist" id="qlist"></div>
+</section>
+
+<section class="panel" id="statpanel" hidden aria-label="PFM 稽核評分統計">
+  <div class="panel-head"><h2>五、PFM 稽核評分統計</h2><span class="hint" id="st-save"></span></div>
+  <div class="st-meta">
+    <span class="st-case" id="st-case"></span>
+    <label>稽核日期<input type="date" data-m="date"></label>
+    <label>受稽單位<input type="text" data-m="unit" placeholder="例如：外科加護病房"></label>
+    <label>稽核者<input type="text" data-m="who"></label>
+  </div>
+  <div class="tools noprint">
+    <label>統計範圍<select id="st-scope"><option value="case">整個個案（全部題目）</option><option value="view">目前篩選的提問</option></select></label>
+    <button class="btn" type="button" id="st-png">下載統計表（PNG）</button>
+    <button class="btn" type="button" id="st-csv">匯出評分明細（CSV）</button>
+    <button class="btn" type="button" id="st-print">列印統計報告</button>
+    <button class="btn" type="button" id="st-save-rec">存成一筆紀錄</button>
+    <button class="btn" type="button" id="st-reset">清除本個案評分</button>
+  </div>
+  <div id="st-body"></div>
+  <div class="st-hist noprint">
+    <div class="st-hist-head"><h3>歷史紀錄</h3><span id="h-msg" role="status"></span>
+      <span class="st-hist-btns"><button class="btn" type="button" id="h-export">匯出備份檔</button><label class="btn" for="h-import">匯入備份檔</label><input type="file" id="h-import" accept=".json,application/json" hidden></span></div>
+    <div id="h-body"></div>
+  </div>
+  <p class="st-note">評分與歷史紀錄只存在目前這台電腦的瀏覽器，換電腦或清除瀏覽資料會消失。請定期按「匯出備份檔」保存，換電腦時用「匯入備份檔」還原；也可用「匯出評分明細」留存每次的 CSV。</p>
 </section>
 
 </div>
@@ -341,6 +431,7 @@ function build(){
   $('clear').addEventListener('click',()=>{state.sel.clear();state.focus=null;state.role='';state.kw='';$('role').value='';$('kw').value='';render()});
   $('allstages').addEventListener('click',()=>{D.STAGES.forEach(s=>state.sel.add(s.k));render()});
   $('copy').addEventListener('click',copyList);
+  initScore();
 }
 function renderEvents(qs){
   const stageMode=[...state.sel].some(k=>stageByKey[k]);
@@ -422,9 +513,211 @@ function render(){
   // 提問
   if(!shown.length)$('qlist').innerHTML=msg;else{
     const groups=[];shown.forEach(q=>{const key=q.s+'|'+q.role;let g=groups.find(x=>x.key===key);if(!g){g={key,q:[],s:q.s,role:q.role,rc:q.rc};groups.push(g)}g.q.push(q)});
-    $('qlist').innerHTML=groups.map(g=>`<div class="rolegroup"><div class="rolehead"><h3>${esc(g.role)}</h3><span class="stg">${esc(stageByKey[g.s].idx<7?'階段 '+(stageByKey[g.s].idx+1)+'　'+stageByKey[g.s].n:'跨階段')}　${g.q.length} 題</span></div><div>${g.q.map(q=>`<div class="q"><div class="qid">${q.id}</div><div class="qtext">${esc(q.q)}</div><dl class="meta"><dt>醫療事件</dt><dd>${(()=>{const ev=qEvents(q);return ev.length?ev.map(e=>`<span class="evtag">${esc(e.n)}</span>`).join(''):'<span class="evtag">未歸類</span>'})()}</dd><dt>條文依據</dt><dd>${refsHTML(q)}</dd><dt>佐證指標</dt><dd>${q.i.length?(q.i.length>8?'七階段全部指標':q.i.map(i=>`<span class="pill ${D.KIND[i]==='過程'?'p':'o'}">${esc(i)}</span>`).join('')):'—'}</dd><dt>佐證資料</dt><dd>${esc(q.e)}</dd></dl></div>`).join('')}</div></div>`).join('');
+    $('qlist').innerHTML=groups.map(g=>`<div class="rolegroup"><div class="rolehead"><h3>${esc(g.role)}</h3><span class="stg">${esc(stageByKey[g.s].idx<7?'階段 '+(stageByKey[g.s].idx+1)+'　'+stageByKey[g.s].n:'跨階段')}　${g.q.length} 題</span></div><div>${g.q.map(q=>`<div class="q${qScoreClass(q)}" data-qid="${q.id}"><div class="qid">${q.id}</div><div class="qtext">${esc(q.q)}</div><dl class="meta"><dt>醫療事件</dt><dd>${(()=>{const ev=qEvents(q);return ev.length?ev.map(e=>`<span class="evtag">${esc(e.n)}</span>`).join(''):'<span class="evtag">未歸類</span>'})()}</dd><dt>條文依據</dt><dd>${refsHTML(q)}</dd><dt>佐證指標</dt><dd>${q.i.length?(q.i.length>8?'七階段全部指標':q.i.map(i=>`<span class="pill ${D.KIND[i]==='過程'?'p':'o'}">${esc(i)}</span>`).join('')):'—'}</dd><dt>佐證資料</dt><dd>${esc(q.e)}</dd></dl>${scoreHTML(q)}</div>`).join('')}</div></div>`).join('');
   }
   window.__shown=shown;
+  scoreProgress();renderStats();
+}
+
+/* ===== PFM 評分與統計 ===== */
+const LVS=['符合','部分符合','不符合','不適用'];
+const LVC={'符合':'#0ca30c','部分符合':'#fab219','不符合':'#d03b3b'};
+const LVT={'符合':'#ffffff','部分符合':'#0b0b0b','不符合':'#ffffff','不適用':'#0b0b0b'};
+const SKEY='pfm-score-v1';
+const SC={on:false,store:{c:{}}};
+try{const r=localStorage.getItem(SKEY);if(r){const o=JSON.parse(r);if(o&&o.c)SC.store=o}}catch(e){}
+let scSaveOk=true;
+function scSave(){try{localStorage.setItem(SKEY,JSON.stringify(SC.store));scSaveOk=true}catch(e){scSaveOk=false}}
+function caseStore(){const k=CASE.k;return SC.store.c[k]=SC.store.c[k]||{meta:{},s:{}}}
+const qScore=q=>(caseStore().s[q.id]||{});
+function qScoreClass(q){const lv=qScore(q).lv;return lv?' sc-'+lv:''}
+function scoreHTML(q){
+  if(!SC.on)return '';const st=qScore(q);
+  return `<div class="score" role="group" aria-label="${q.id} 評分"><span class="lab">評分</span>${LVS.map(l=>`<button type="button" data-lv="${l}" aria-pressed="${st.lv===l}">${l}</button>`).join('')}<input type="text" data-note placeholder="查核發現／備註" value="${esc(st.note||'')}"></div>`;
+}
+function scoreProgress(){
+  const all=D.Q,cs=caseStore().s,done=all.filter(q=>cs[q.id]&&cs[q.id].lv).length;
+  $('scoreprog').textContent=(SC.on||done)?`已評分 ${done} / ${all.length} 題`:'';
+  $('statpanel').hidden=!(SC.on||done||HIST.some(r=>r.caseK===CASE.k));
+}
+function stagesLabel(k){const s=stageByKey[k];return s.idx<7?'階段 '+(s.idx+1)+' '+s.n:(s.n.startsWith('跨階段')?s.n:'跨階段 '+s.n)}
+function agg(list){
+  const c={'符合':0,'部分符合':0,'不符合':0,'不適用':0},cs=caseStore().s;
+  list.forEach(q=>{const lv=cs[q.id]&&cs[q.id].lv;if(lv)c[lv]++});
+  const den=c['符合']+c['部分符合']+c['不符合'];
+  return {n:list.length,c,rated:den+c['不適用'],rate:den?(c['符合']+c['部分符合']*0.5)/den:null};
+}
+const pct=r=>r==null?'—':(r*100).toFixed(1)+'%';
+function themeInk(){const cs=getComputedStyle(document.documentElement);const g=v=>cs.getPropertyValue(v).trim();return {ink:g('--ink')||'#16282b',muted:g('--muted')||'#5a6d70',line:g('--line')||'#d3dcda',surface:g('--surface')||'#ffffff',na:g('--line')||'#d3dcda',font:g('--body')||'Arial,"Microsoft JhengHei",sans-serif'}}
+function trunc(t,n){return t.length>n?t.slice(0,n-1)+'…':t}
+/* 100% 堆疊橫條圖：rows=[{label,list}] */
+function barChart(rows,T,labelW,noRate){
+  const W=780,LW=labelW||170,BX=LW+10,BW=W-BX-170,RH=34,BH=18,top=6,H=top+rows.length*RH+6;
+  const fe=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  let g='';
+  rows.forEach((r,i)=>{
+    const y=top+i*RH;
+    if(r.header){g+=`<text x="4" y="${y+RH-9}" font-size="13" font-weight="700" fill="${T.ink}">${fe(r.header)}</text><line x1="4" x2="${W-4}" y1="${y+RH-2}" y2="${y+RH-2}" stroke="${T.line}"/>`;return}
+    const a=r.a,by=y+(RH-BH)/2,tot=a.rated;
+    g+=`<text x="${LW}" y="${by+BH/2}" text-anchor="end" dominant-baseline="central" font-size="12.5" fill="${T.ink}"><title>${fe(r.label)}</title>${fe(trunc(r.label,LW>200?17:13))}</text>`;
+    if(!tot){g+=`<rect x="${BX}" y="${by}" width="${BW}" height="${BH}" rx="4" fill="none" stroke="${T.line}" stroke-dasharray="3 3"/><text x="${BX+8}" y="${by+BH/2}" dominant-baseline="central" font-size="11.5" fill="${T.muted}">尚未評分</text>`;}
+    else{
+      const segs=LVS.filter(l=>a.c[l]),gap=2,avail=BW-gap*(segs.length-1);let x=BX;
+      g+=`<clipPath id="cp${r.id}"><rect x="${BX}" y="${by}" width="${BW}" height="${BH}" rx="4"/></clipPath><g clip-path="url(#cp${r.id})">`;
+      segs.forEach((l,j)=>{const w=avail*a.c[l]/tot,fill=LVC[l]||T.na;
+        g+=`<rect x="${x.toFixed(1)}" y="${by}" width="${Math.max(w,0.5).toFixed(1)}" height="${BH}" fill="${fill}"><title>${fe(r.label)}｜${l} ${a.c[l]} 題（${(a.c[l]/tot*100).toFixed(0)}%）</title></rect>`;
+        if(w>=24)g+=`<text x="${(x+w/2).toFixed(1)}" y="${by+BH/2}" text-anchor="middle" dominant-baseline="central" font-size="11.5" font-weight="700" fill="${LVT[l]}" pointer-events="none">${a.c[l]}</text>`;
+        x+=w+gap;});
+      g+='</g>';
+    }
+    g+=`<text x="${BX+BW+12}" y="${by+BH/2}" dominant-baseline="central" font-size="12.5" fill="${T.ink}"><tspan fill="${T.muted}">已評 ${a.rated}/${a.n}</tspan></text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family='${T.font}' role="img">${g}</svg>`;
+}
+function legendHTML(){return '<div class="st-legend">'+LVS.map(l=>`<span><i style="background:${LVC[l]||'var(--line)'}"></i>${l}</span>`).join('')+'<span>右側：已評題數／題數</span></div>'}
+let stRows=null;
+function scopeList(){return $('st-scope').value==='view'?(window.__shown||[]):D.Q}
+function renderStats(){
+  if($('statpanel').hidden)return;
+  renderHistory();
+  const cst=caseStore(),T=themeInk(),list=scopeList();
+  $('st-case').textContent=CASE.name;
+  document.querySelectorAll('.st-meta input').forEach(i=>{if(document.activeElement!==i)i.value=cst.meta[i.dataset.m]||''});
+  $('st-save').textContent=scSaveOk?'評分自動存在此瀏覽器':'此瀏覽器無法自動保存，請記得匯出 CSV';
+  const tot=agg(list);
+  if(!list.length){$('st-body').innerHTML='<p class="st-empty">目前篩選範圍沒有提問，請改選「整個個案」或調整上方情境。</p>';stRows=null;return}
+  let n=0;const mk=(label,l)=>({id:'r'+(n++),label,list:l,a:agg(l)});
+  const byStage=CASE.STAGES.map(st=>mk(stagesLabel(st.k),list.filter(q=>q.s===st.k))).filter(r=>r.a.rated);
+  const roles=[...new Set(list.map(q=>q.role))];
+  const byRole=[],roleRows=[],tblRows=[];CASE.STAGES.forEach(st=>{const inS=list.filter(q=>q.s===st.k);const rr=[...new Set(inS.map(q=>q.role))].map(r=>{const o=mk(r,inS.filter(q=>q.role===r));o.tlabel=stagesLabel(st.k)+'｜'+r;return o}).filter(o=>o.a.rated);if(rr.length){byRole.push({header:stagesLabel(st.k)},...rr);roleRows.push(...rr);const sr=mk(stagesLabel(st.k),inS);sr.stage=true;tblRows.push(sr,...rr.map(o=>Object.assign({},o,{sub:true})))}});
+  const evs=D.EVENTS.map(e=>mk(e.n,list.filter(q=>matchEvent(q,e)))).filter(r=>r.list.length&&r.a.rated);
+  stRows={overall:[mk('全部題目',list)],byStage,byRole,roleRows,tblRows,evs};
+  const bad=list.filter(q=>{const lv=cst.s[q.id]&&cst.s[q.id].lv;return lv==='不符合'||lv==='部分符合'}).sort((a,b)=>(cst.s[a.id].lv==='部分符合'?0:1)-(cst.s[b.id].lv==='部分符合'?0:1));
+  $('st-body').innerHTML=`<div class="st-tiles"><div class="stat"><b>${tot.rated}</b> / ${tot.n} 題已評分</div>${LVS.map(l=>`<div class="stat"><b>${tot.c[l]}</b> ${l}</div>`).join('')}</div>`+
+    (tot.rated?'':'<p class="st-empty">尚未評分。按上方「開始評分」，在每題下方點選符合、部分符合、不符合或不適用，統計會即時更新。</p>')+
+    `<div class="st-chart"><h3>統計表</h3><div class="st-wrap"><table class="st-table"><thead><tr><th>類別</th><th>題數</th><th>已評</th>${LVS.map(l=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${[...stRows.overall,...stRows.tblRows].map(r=>`<tr class="${r.stage?'st-grp':r.sub?'st-sub':'st-all'}"><td>${esc(r.sub?r.label:r.label)}</td><td>${r.a.n}</td><td>${r.a.rated}</td>${LVS.map(l=>`<td>${r.a.c[l]}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`+
+    `<div class="st-chart"><h3>待改善項目（部分符合 ${tot.c['部分符合']} 題、不符合 ${tot.c['不符合']} 題）</h3>${bad.length?CASE.STAGES.map(st=>{const b=bad.filter(q=>q.s===st.k);if(!b.length)return '';const nf=b.filter(q=>cst.s[q.id].lv==='不符合').length;return `<h4 class="st-sub-h">${esc(stagesLabel(st.k))}（部分符合 ${b.length-nf} 題、不符合 ${nf} 題）</h4><div class="st-wrap"><table class="st-table st-bad"><thead><tr><th>題號</th><th>受訪人員</th><th>題目</th><th>評分</th><th>查核發現／備註</th></tr></thead><tbody>${b.map(q=>{const v=cst.s[q.id];return `<tr><td>${q.id}</td><td>${esc(q.role)}</td><td>${esc(q.q)}</td><td class="lv" style="color:${v.lv==='不符合'?'#d03b3b':T.ink}">${v.lv}</td><td>${esc(v.note||'')}</td></tr>`}).join('')}</tbody></table></div>`}).join(''):'<p class="st-empty">目前沒有不符合或部分符合的題目。</p>'}</div>`;
+}
+function statsSVGForExport(){
+  const T=themeInk(),list=scopeList(),cst=caseStore();if(!stRows)return null;
+  const W=780,fe=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;'),tot=agg(list),meta=cst.meta;
+  let y=24,body=`<text x="20" y="${y}" font-size="17" font-weight="700" fill="${T.ink}">${fe(CASE.name)}　PFM 稽核評分統計</text>`;
+  y+=24;body+=`<text x="20" y="${y}" font-size="12.5" fill="${T.muted}">${fe(['稽核日期：'+(meta.date||'—'),'受稽單位：'+(meta.unit||'—'),'稽核者：'+(meta.who||'—'),'範圍：'+($('st-scope').value==='view'?'目前篩選的提問':'整個個案')].join('　'))}</text>`;
+  y+=24;body+=`<text x="20" y="${y}" font-size="13.5" fill="${T.ink}">已評分 ${tot.rated}/${tot.n} 題　${LVS.map(l=>l+' '+tot.c[l]).join('　')}</text>`;
+  y+=22;body+=`<text x="20" y="${y}" font-size="14" font-weight="700" fill="${T.ink}">統計表</text>`;y+=10;
+  const cols=[['類別',20,'start'],['題數',330,'end'],['已評',400,'end'],['符合',475,'end'],['部分符合',565,'end'],['不符合',655,'end'],['不適用',750,'end']],RH=28;
+  body+=`<rect x="12" y="${y}" width="${W-24}" height="${RH}" fill="${T.line}" opacity=".45"/>`+cols.map(([t,x,an])=>`<text x="${x}" y="${y+RH/2}" dominant-baseline="central" text-anchor="${an}" font-size="12.5" font-weight="700" fill="${T.ink}">${t}</text>`).join('');y+=RH;
+  [...stRows.overall,...stRows.tblRows].forEach(r=>{
+    const bold=!r.sub;if(r.stage)body+=`<rect x="12" y="${y}" width="${W-24}" height="${RH}" fill="${T.line}" opacity=".25"/>`;
+    const v=[r.label,r.a.n,r.a.rated,...LVS.map(l=>r.a.c[l])];
+    body+=cols.map(([t,x,an],k)=>`<text x="${k===0&&r.sub?x+20:x}" y="${y+RH/2}" dominant-baseline="central" text-anchor="${an}" font-size="12.5" ${bold?'font-weight="700"':''} fill="${T.ink}">${fe(v[k])}</text>`).join('');
+    y+=RH;body+=`<line x1="12" x2="${W-12}" y1="${y}" y2="${y}" stroke="${T.line}"/>`;
+  });
+  y+=14;
+  return {svg:`<svg xmlns="http://www.w3.org/2000/svg" width="${W*2}" height="${y*2}" viewBox="0 0 ${W} ${y}" font-family='${T.font}'><rect width="${W}" height="${y}" fill="${T.surface}"/>${body}</svg>`,w:W*2,h:y*2};
+}
+function stDownload(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+const stFileBase=()=>CASE.name.replace(/[（）()／/\\\s]/g,'')+'_PFM評分_'+(caseStore().meta.date||new Date().toISOString().slice(0,10));
+function stPNG(){
+  const o=statsSVGForExport();if(!o)return;
+  const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=o.w;c.height=o.h;const x=c.getContext('2d');x.drawImage(img,0,0);c.toBlob(b=>{if(b)stDownload(b,stFileBase()+'.png')},'image/png')};
+  img.onerror=()=>{stDownload(new Blob([o.svg],{type:'image/svg+xml'}),stFileBase()+'.svg')};
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(o.svg);
+}
+function stCSV(){
+  const q=x=>'"'+String(x??'').replace(/"/g,'""')+'"',cst=caseStore(),m=cst.meta,list=scopeList();
+  const L=[[ '個案',CASE.name,'稽核日期',m.date,'受稽單位',m.unit,'稽核者',m.who].map(q).join(','),'',
+    ['題號','階段','受訪人員','題目','條文依據','醫療事件','評分','查核發現／備註'].map(q).join(',')];
+  list.forEach(x=>{const v=cst.s[x.id]||{};L.push([x.id,stagesLabel(x.s),x.role,x.q,x.ct,qEvents(x).map(e=>e.n).join('、'),v.lv||'',v.note||''].map(q).join(','))});
+  if(stRows){L.push('',['類別','題數','已評',...LVS].map(q).join(','));[...stRows.overall,...stRows.tblRows].forEach(r=>L.push([r.sub?'　'+r.label:r.label,r.a.n,r.a.rated,...LVS.map(l=>r.a.c[l])].map(q).join(',')))}
+  stDownload(new Blob(['﻿'+L.join('\r\n')],{type:'text/csv;charset=utf-8'}),stFileBase()+'.csv');
+}
+
+/* ===== 歷史紀錄 ===== */
+const HKEY='pfm-history-v1';
+let HIST=[];
+try{const r=localStorage.getItem(HKEY);if(r){const o=JSON.parse(r);if(Array.isArray(o))HIST=o}}catch(e){}
+function hSave(){try{localStorage.setItem(HKEY,JSON.stringify(HIST));return true}catch(e){return false}}
+function hMsg(t){const m=$('h-msg');if(m){m.textContent=t;clearTimeout(hMsg.t);hMsg.t=setTimeout(()=>{m.textContent=''},5000)}}
+function hCount(scores){const c={'符合':0,'部分符合':0,'不符合':0,'不適用':0};Object.values(scores).forEach(v=>{if(v&&c[v.lv]!=null)c[v.lv]++});return c}
+const hStageCount=(rec,stk)=>{const c={'符合':0,'部分符合':0,'不符合':0,'不適用':0};D.Q.filter(q=>q.s===stk).forEach(q=>{const v=rec.scores[q.id];if(v&&c[v.lv]!=null)c[v.lv]++});return c};
+function hSaveRecord(){
+  const cs=caseStore(),sc={};Object.entries(cs.s).forEach(([k,v])=>{if(v&&(v.lv||v.note))sc[k]={lv:v.lv||'',note:v.note||''}});
+  const n=Object.values(sc).filter(v=>v.lv).length;
+  if(!n){hMsg('目前沒有任何評分，無法存成紀錄');return}
+  const rec={id:'h'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),caseK:CASE.k,caseName:CASE.name,savedAt:new Date().toISOString(),meta:{date:cs.meta.date||new Date().toISOString().slice(0,10),unit:cs.meta.unit||'',who:cs.meta.who||''},scores:sc};
+  HIST.push(rec);const ok=hSave();
+  hMsg(ok?`已存成一筆紀錄（${rec.meta.date}${rec.meta.unit?'｜'+rec.meta.unit:''}，已評 ${n} 題）`:'瀏覽器無法保存，請改用「匯出備份檔」');
+  renderHistory();
+}
+function fmtTime(iso){try{const d=new Date(iso);return d.toLocaleString('zh-TW',{hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}catch(e){return iso}}
+let hLoadedId=null;
+function renderHistory(){
+  const box=$('h-body');if(!box)return;
+  const recs=HIST.filter(r=>r.caseK===CASE.k).sort((a,b)=>(a.meta.date+a.savedAt).localeCompare(b.meta.date+b.savedAt));
+  const others=HIST.length-recs.length;
+  if(!recs.length){box.innerHTML=`<p class="st-empty">「${esc(CASE.name)}」還沒有存過紀錄。評完分後按上方「存成一筆紀錄」，就會出現在這裡。${others?`（其他個案共有 ${others} 筆紀錄）`:''}</p>`;return}
+  const head=`<thead><tr><th>稽核日期</th><th>受稽單位</th><th>稽核者</th><th class="num">已評</th>${LVS.map(l=>`<th class="num">${l}</th>`).join('')}<th>儲存時間</th><th>操作</th></tr></thead>`;
+  const rows=recs.slice().reverse().map(r=>{const c=hCount(r.scores),n=c['符合']+c['部分符合']+c['不符合']+c['不適用'];
+    return `<tr data-h="${r.id}"${r.id===hLoadedId?' class="cur"':''}><td>${esc(r.meta.date)}</td><td>${esc(r.meta.unit||'—')}</td><td>${esc(r.meta.who||'—')}</td><td class="num">${n}</td>${LVS.map(l=>`<td class="num">${c[l]}</td>`).join('')}<td>${esc(fmtTime(r.savedAt))}</td><td class="act"><button type="button" data-act="load">載入檢視</button><button type="button" data-act="del">刪除</button></td></tr>`}).join('');
+  let cmp='';
+  if(recs.length>=2){
+    const last=recs.slice(-6);
+    const stages=CASE.STAGES.filter(st=>last.some(r=>{const c=hStageCount(r,st.k);return c['符合']+c['部分符合']+c['不符合']+c['不適用']}));
+    cmp=`<h4 class="st-sub-h">歷次比較（依階段，最近 ${last.length} 筆；格內為 符合｜部分符合｜不符合 題數）</h4><div class="st-wrap"><table class="st-table cmp"><thead><tr><th>階段</th>${last.map(r=>`<th>${esc(r.meta.date)}${r.meta.unit?'<br><span class="c3">'+esc(r.meta.unit)+'</span>':''}</th>`).join('')}</tr></thead><tbody>${stages.map(st=>`<tr><td>${esc(stagesLabel(st.k))}</td>${last.map(r=>{const c=hStageCount(r,st.k),n=c['符合']+c['部分符合']+c['不符合']+c['不適用'];return `<td class="c3">${n?`<b>${c['符合']}</b>｜<b>${c['部分符合']}</b>｜<b>${c['不符合']}</b>`:'—'}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>`;
+  }
+  box.innerHTML=`<p class="st-empty" style="margin:8px 0">「${esc(CASE.name)}」共 ${recs.length} 筆紀錄${others?`；其他個案共 ${others} 筆`:''}。「載入檢視」會把該次評分放回上方，可重新查看、修改或匯出。</p><div class="st-wrap"><table class="st-table">${head}<tbody>${rows}</tbody></table></div>${cmp}`;
+}
+function hLoad(id,btn){
+  const r=HIST.find(x=>x.id===id);if(!r)return;
+  const cs=caseStore();const hasWork=Object.values(cs.s).some(v=>v&&v.lv);
+  if(hasWork&&!btn.dataset.armed){btn.dataset.armed='1';btn.textContent='再按一次確認（目前評分會被取代）';setTimeout(()=>{if(btn.isConnected&&btn.dataset.armed){delete btn.dataset.armed;btn.textContent='載入檢視'}},5000);return}
+  SC.store.c[CASE.k]={meta:{...r.meta},s:JSON.parse(JSON.stringify(r.scores))};scSave();hLoadedId=id;
+  hMsg(`已載入 ${r.meta.date}${r.meta.unit?'｜'+r.meta.unit:''} 的紀錄；修改後若要保留，請再按「存成一筆紀錄」`);
+  render();
+}
+function hDel(id,btn){
+  if(!btn.dataset.armed){btn.dataset.armed='1';btn.textContent='再按一次確認刪除';setTimeout(()=>{if(btn.isConnected&&btn.dataset.armed){delete btn.dataset.armed;btn.textContent='刪除'}},4000);return}
+  HIST=HIST.filter(x=>x.id!==id);if(hLoadedId===id)hLoadedId=null;hSave();hMsg('已刪除一筆紀錄');renderHistory();
+}
+function hExport(){
+  const data={type:'pfm-score-backup',version:1,exportedAt:new Date().toISOString(),history:HIST,current:SC.store};
+  stDownload(new Blob([JSON.stringify(data,null,1)],{type:'application/json'}),'PFM評分備份_'+new Date().toISOString().slice(0,10)+'.json');
+  hMsg(`已匯出備份檔（歷史紀錄 ${HIST.length} 筆）`);
+}
+function hImport(file){
+  const fr=new FileReader();
+  fr.onload=()=>{try{
+    const o=JSON.parse(fr.result);if(!o||o.type!=='pfm-score-backup'||!Array.isArray(o.history))throw new Error('格式不符');
+    const have=new Set(HIST.map(r=>r.id));let add=0;
+    o.history.forEach(r=>{if(r&&r.id&&r.caseK&&r.scores&&r.meta&&!have.has(r.id)){HIST.push(r);add++}});
+    hSave();hMsg(`已匯入 ${add} 筆新紀錄${o.history.length-add?`（${o.history.length-add} 筆已存在，略過）`:''}`);renderHistory();
+  }catch(e){hMsg('匯入失敗：這不是本網站匯出的備份檔')}};
+  fr.readAsText(file,'utf-8');
+}
+function initHistory(){
+  $('st-save-rec').addEventListener('click',hSaveRecord);
+  $('h-export').addEventListener('click',hExport);
+  $('h-import').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(f)hImport(f);e.target.value=''});
+  $('h-body').addEventListener('click',e=>{const b=e.target.closest('button[data-act]');if(!b)return;const id=b.closest('tr').dataset.h;if(b.dataset.act==='load')hLoad(id,b);else hDel(id,b)});
+}
+function initScore(){
+  initHistory();
+  $('scoremode').addEventListener('click',()=>{SC.on=!SC.on;const b=$('scoremode');b.setAttribute('aria-pressed',SC.on);b.textContent=SC.on?'結束評分':'開始評分';render()});
+  $('qlist').addEventListener('click',e=>{const b=e.target.closest('.score button[data-lv]');if(!b)return;const card=b.closest('.q'),id=card.dataset.qid,cs=caseStore().s,st=cs[id]=cs[id]||{};
+    st.lv=st.lv===b.dataset.lv?'':b.dataset.lv;if(!st.lv&&!st.note)delete cs[id];scSave();
+    card.querySelectorAll('.score button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.lv===st.lv));
+    card.className='q'+(st.lv?' sc-'+st.lv:'');scoreProgress();renderStats()});
+  let nt;$('qlist').addEventListener('input',e=>{const i=e.target.closest('input[data-note]');if(!i)return;const id=i.closest('.q').dataset.qid,cs=caseStore().s,st=cs[id]=cs[id]||{};st.note=i.value;if(!st.lv&&!st.note)delete cs[id];scSave();clearTimeout(nt);nt=setTimeout(renderStats,400)});
+  document.querySelectorAll('.st-meta input').forEach(i=>i.addEventListener('input',()=>{caseStore().meta[i.dataset.m]=i.value;scSave()}));
+  $('st-scope').addEventListener('change',renderStats);
+  $('st-png').addEventListener('click',stPNG);
+  $('st-csv').addEventListener('click',stCSV);
+  $('st-print').addEventListener('click',()=>{document.body.classList.add('ps');window.print();setTimeout(()=>document.body.classList.remove('ps'),500)});
+  window.addEventListener('afterprint',()=>document.body.classList.remove('ps'));
+  $('st-reset').addEventListener('click',()=>{const b=$('st-reset');if(b.dataset.armed){SC.store.c[CASE.k]={meta:{},s:{}};scSave();delete b.dataset.armed;b.textContent='清除本個案評分';render()}else{b.dataset.armed='1';b.textContent='再按一次確認清除';setTimeout(()=>{if(b.dataset.armed){delete b.dataset.armed;b.textContent='清除本個案評分'}},4000)}});
+  new MutationObserver(renderStats).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',renderStats)}catch(e){}
 }
 function copyList(){
   const qs=window.__shown||[];const m=$('copymsg');
