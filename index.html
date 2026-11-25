@@ -61,6 +61,8 @@ select,input[type=search]{font:inherit;color:var(--ink);background:var(--surface
 input[type=search]{min-width:200px}
 .btn{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 12px;font-size:13.5px}
 .btn:hover{border-color:var(--accent)}
+.btn-link-ntu{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.btn-link-ntu:hover{filter:brightness(1.08)}
 /* 摘要列 */
 .summary{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;background:var(--accent-soft);border-radius:10px;padding:12px 18px}
 .summary .sel{flex:1 1 280px;font-weight:500}
@@ -288,7 +290,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
 
 <section class="panel" id="spcpanel" hidden>
   <div class="panel-head"><h2>指標管制圖：<span id="spc-ind"></span></h2>
-    <span><button class="btn" id="spc-more" type="button">在管制圖總覽開啟</button> <button class="btn" id="spc-close" type="button">關閉</button></span></div>
+    <span><button class="btn" id="spc-more" type="button">在管制圖總覽開啟</button> <button class="btn btn-link-ntu" id="spc-ntu" type="button">SPC 深入分析</button> <button class="btn" id="spc-close" type="button">關閉</button></span></div>
   <div class="chips" id="spc-codes"></div>
   <h3 id="spc-title"></h3>
   <p class="cmeta" id="spc-meta"></p>
@@ -349,7 +351,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
     </section>
     <section class="panel">
       <div class="panel-head"><h2 id="o-title"></h2>
-        <span><button class="btn" id="o-prev" type="button">‹ 上一支</button> <button class="btn" id="o-next" type="button">下一支 ›</button></span></div>
+        <span><button class="btn" id="o-prev" type="button">‹ 上一支</button> <button class="btn" id="o-next" type="button">下一支 ›</button> <button class="btn btn-link-ntu" id="o-ntu" type="button" title="帶入 SPC 管制圖分析系統，可做分期比較、自訂中心線、匯出 PNG">在 SPC 分析系統深入分析 ›</button></span></div>
       <p class="cmeta" id="o-meta"></p>
       <div class="chartbox" id="o-chart"></div>
       <div class="legend"><span><i class="sw val"></i>本院每月數值</span><span><i class="sw cl"></i>中心線（各階段）</span><span><i class="sw s1"></i>±1σ</span><span><i class="sw s2"></i>±2σ</span><span><i class="sw lim"></i>管制上限／下限（±3σ）</span><span><i class="dot out"></i>超出管制界限</span><span><i class="dot run"></i>符合規則 2–8（滑到點上看規則）</span></div>
@@ -938,6 +940,16 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
       color: #991b1b;
     }
     .hidden { display: none !important; }
+    .link-card { border-color: #c7d2fe; background: linear-gradient(90deg, #eef2ff 0%, #ffffff 60%); }
+    .link-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.625rem; }
+    .link-title { font-size: 0.8125rem; font-weight: 700; color: #3730a3; white-space: nowrap; }
+    .link-sel { width: auto; min-width: 9rem; padding: 0.45rem 0.75rem; font-size: 0.8125rem; }
+    #linkCode { flex: 1; min-width: 16rem; }
+    .link-status { margin-top: 0.625rem; font-size: 0.8125rem; color: #334155; line-height: 1.6; }
+    .link-status b { color: #1e1b4b; }
+    .link-tag { display: inline-block; padding: 0.05rem 0.5rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; background: #e0e7ff; color: #3730a3; margin-right: 0.35rem; }
+    .link-tag.manual { background: #f1f5f9; color: #475569; }
+    .link-tag.dirty { background: #fef3c7; color: #92400e; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-6px); }
       to { opacity: 1; transform: translateY(0); }
@@ -1004,6 +1016,17 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
 
   &lt;!-- 主要內容區 --&gt;
   &lt;main&gt;
+
+    &lt;!-- 區塊 0：與「管制圖總覽」連動 --&gt;
+    &lt;section class=&quot;glass-card link-card hidden&quot; id=&quot;linkCard&quot; style=&quot;padding:0.875rem 1.25rem;&quot;&gt;
+      &lt;div class=&quot;link-row&quot;&gt;
+        &lt;span class=&quot;link-title&quot;&gt;從「管制圖總覽」帶入院內指標&lt;/span&gt;
+        &lt;select id=&quot;linkGroup&quot; class=&quot;form-select link-sel&quot; onchange=&quot;populateLinkCodes()&quot; aria-label=&quot;指標類別&quot;&gt;&lt;option value=&quot;&quot;&gt;全部類別&lt;/option&gt;&lt;/select&gt;
+        &lt;select id=&quot;linkCode&quot; class=&quot;form-select link-sel&quot; aria-label=&quot;指標&quot;&gt;&lt;/select&gt;
+        &lt;button class=&quot;btn btn-indigo&quot; onclick=&quot;requestLinkedIndicator()&quot;&gt;帶入分析&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div id=&quot;linkStatus&quot; class=&quot;link-status&quot;&gt;&lt;/div&gt;
+    &lt;/section&gt;
 
     &lt;!-- 區塊 1：控制中心與參數設定 --&gt;
     &lt;section class=&quot;glass-card&quot;&gt;
@@ -1318,6 +1341,105 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
       }, 4500);
     }
 
+    // --- 1b. 與主站「管制圖總覽」連動 ---
+    let linkedIndicator = null;   // { code, name, group, unit, chartType, data, baseline, phase2Label, dirty }
+    let linkCatalog = [];
+    const isEmbedded = (() =&gt; { try { return window.parent &amp;&amp; window.parent !== window; } catch (e) { return false; } })();
+    const LINK_TYPE_LABEL = { u: &#x27;u 管制圖&#x27;, p: &#x27;p 管制圖&#x27;, imr: &#x27;I-MR 管制圖&#x27; };
+
+    function escHtml(s) {
+      return String(s).replace(/[&amp;&lt;&gt;&quot;&#x27;]/g, ch =&gt; ({ &#x27;&amp;&#x27;: &#x27;&amp;amp;&#x27;, &#x27;&lt;&#x27;: &#x27;&amp;lt;&#x27;, &#x27;&gt;&#x27;: &#x27;&amp;gt;&#x27;, &#x27;&quot;&#x27;: &#x27;&amp;quot;&#x27;, &quot;&#x27;&quot;: &#x27;&amp;#39;&#x27; }[ch]));
+    }
+
+    // 由主站呼叫：提供 158 支指標清單
+    function setIndicatorCatalog(list) {
+      linkCatalog = list || [];
+      const groups = [...new Set(linkCatalog.map(x =&gt; x.group))];
+      const gSel = document.getElementById(&#x27;linkGroup&#x27;);
+      gSel.innerHTML = &#x27;&lt;option value=&quot;&quot;&gt;全部類別&lt;/option&gt;&#x27; + groups.map(g =&gt; `&lt;option&gt;${escHtml(g)}&lt;/option&gt;`).join(&#x27;&#x27;);
+      populateLinkCodes();
+      document.getElementById(&#x27;linkCard&#x27;).classList.toggle(&#x27;hidden&#x27;, linkCatalog.length === 0);
+      renderLinkStatus();
+    }
+
+    function populateLinkCodes() {
+      const g = document.getElementById(&#x27;linkGroup&#x27;).value;
+      const sel = document.getElementById(&#x27;linkCode&#x27;);
+      const items = linkCatalog.filter(x =&gt; !g || x.group === g);
+      sel.innerHTML = items.map(x =&gt; `&lt;option value=&quot;${escHtml(x.code)}&quot;&gt;${escHtml(x.code)}　${escHtml(x.name)}（${escHtml(x.unit)}）&lt;/option&gt;`).join(&#x27;&#x27;);
+      if (linkedIndicator &amp;&amp; items.some(x =&gt; x.code === linkedIndicator.code)) sel.value = linkedIndicator.code;
+    }
+
+    function requestLinkedIndicator() {
+      const code = document.getElementById(&#x27;linkCode&#x27;).value;
+      if (!code) return;
+      try {
+        if (isEmbedded &amp;&amp; typeof window.parent.ntuLoadCode === &#x27;function&#x27;) window.parent.ntuLoadCode(code, false);
+      } catch (e) { showToastMessage(&#x27;無法從管制圖總覽讀取指標資料&#x27;, true); }
+    }
+
+    function goOverview() {
+      if (!linkedIndicator) return;
+      try {
+        if (isEmbedded &amp;&amp; typeof window.parent.ntuGoOverview === &#x27;function&#x27;) window.parent.ntuGoOverview(linkedIndicator.code);
+      } catch (e) {}
+    }
+
+    // 由主站呼叫：載入一支指標的每月資料
+    function loadExternalIndicator(p) {
+      linkedIndicator = Object.assign({}, p, { dirty: false });
+      chartType = p.chartType;
+      document.getElementById(&#x27;chartTypeSelect&#x27;).value = p.chartType;
+      currentData = JSON.parse(JSON.stringify(p.data));
+      document.getElementById(&#x27;baselineLockCheck&#x27;).checked = false;
+      document.getElementById(&#x27;customClCheck&#x27;).checked = false;
+      document.getElementById(&#x27;customClValue&#x27;).value = &#x27;&#x27;;
+      if (p.baseline &gt;= 2) document.getElementById(&#x27;baselineCount&#x27;).value = p.baseline;
+      document.getElementById(&#x27;customClInputGroup&#x27;).classList.add(&#x27;disabled-group&#x27;);
+      document.getElementById(&#x27;baselineInputGroup&#x27;).classList.add(&#x27;disabled-group&#x27;);
+      updateChartTypeUI();
+      renderDataTable();
+      recalculateAndRender();
+      document.getElementById(&#x27;linkGroup&#x27;).value = &#x27;&#x27;;
+      populateLinkCodes();
+      document.getElementById(&#x27;linkGroup&#x27;).value = p.group;
+      populateLinkCodes();
+      renderLinkStatus();
+      showToastMessage(`已帶入 ${p.code} ${p.name}（${p.data.length} 個月，${LINK_TYPE_LABEL[p.chartType] || &#x27;&#x27;}）`);
+    }
+
+    function markManualEdit() {
+      if (linkedIndicator &amp;&amp; !linkedIndicator.dirty) {
+        linkedIndicator.dirty = true;
+        renderLinkStatus();
+      }
+    }
+
+    function clearLinkedIndicator() {
+      linkedIndicator = null;
+      renderLinkStatus();
+    }
+
+    function renderLinkStatus() {
+      const el = document.getElementById(&#x27;linkStatus&#x27;);
+      if (!el) return;
+      if (!linkedIndicator) {
+        el.innerHTML = &#x27;&lt;span class=&quot;link-tag manual&quot;&gt;手動資料&lt;/span&gt;目前分析的是示範教案或自行輸入／匯入的資料。選一支指標按「帶入分析」，即可用本系統做分期比較、自訂中心線與匯出圖表。&#x27;;
+        return;
+      }
+      const p = linkedIndicator;
+      const first = p.data[0] ? p.data[0].month : &#x27;&#x27;;
+      const last = p.data.length ? p.data[p.data.length - 1].month : &#x27;&#x27;;
+      const imrNote = p.chartType === &#x27;imr&#x27; ? &#x27;I-MR 圖以每月「分子 ÷ 分母」平均值為觀測值。&#x27; : &#x27;&#x27;;
+      el.innerHTML =
+        `&lt;span class=&quot;link-tag&quot;&gt;已連動&lt;/span&gt;${p.dirty ? &#x27;&lt;span class=&quot;link-tag dirty&quot;&gt;資料已手動修改&lt;/span&gt;&#x27; : &#x27;&#x27;}` +
+        `&lt;b&gt;${escHtml(p.code)}　${escHtml(p.name)}&lt;/b&gt;（${escHtml(p.group)}）｜${escHtml(first)}–${escHtml(last)} 共 ${p.data.length} 個月｜${LINK_TYPE_LABEL[p.chartType] || &#x27;&#x27;}` +
+        `　&lt;button class=&quot;link-btn&quot; onclick=&quot;goOverview()&quot;&gt;回到管制圖總覽看這支指標 ›&lt;/button&gt;&lt;br&gt;` +
+        `&lt;span style=&quot;color:#64748b;font-size:0.75rem;&quot;&gt;本系統預設以全期計算一組管制界限，總覽則按 2024、2025、2026 年分段計算，兩邊判讀結果可能不同。` +
+        (p.baseline &gt;= 2 ? `勾選「改善前後分期比較」即以前 ${p.baseline} 個月（2024–2025 年）為 Phase I、${escHtml(p.phase2Label || &#x27;其後&#x27;)} 為 Phase II。` : &#x27;&#x27;) +
+        `${imrNote}&lt;/span&gt;`;
+    }
+
     // --- 2. 初始化與事件綁定 ---
     window.onload = function () {
       setupDragAndDrop();
@@ -1328,6 +1450,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
     };
 
     function loadDefaultFallCase() {
+      clearLinkedIndicator();
       currentData = JSON.parse(JSON.stringify(defaultFallData));
       document.getElementById(&#x27;chartTypeSelect&#x27;).value = &#x27;u&#x27;;
       chartType = &#x27;u&#x27;;
@@ -1349,6 +1472,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
       if (chartType === &#x27;g&#x27;) {
         const hasValidFullDates = currentData.length &gt;= 3 &amp;&amp; currentData.every(d =&gt; !isNaN(parseDateString(d.month)));
         if (!hasValidFullDates) {
+          clearLinkedIndicator();
           currentData = JSON.parse(JSON.stringify(defaultRareEventData));
           showToastMessage(&quot;已自動載入「罕見事件發生日期」示範資料，您可直接修改或匯入 CSV/Excel 日期！&quot;);
         }
@@ -1356,6 +1480,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
       } else if (prevType === &#x27;g&#x27;) {
         const isDefaultRare = currentData.length === defaultRareEventData.length &amp;&amp; currentData[0]?.month === &#x27;2025/01/05&#x27;;
         if (isDefaultRare) {
+          clearLinkedIndicator();
           currentData = JSON.parse(JSON.stringify(defaultFallData));
         }
       }
@@ -1573,6 +1698,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
     }
 
     function updateCell(index, field, value) {
+      markManualEdit();
       if (field === &#x27;month&#x27;) {
         currentData[index].month = value.trim() || `期別 ${index + 1}`;
         if (chartType === &#x27;g&#x27;) {
@@ -1587,6 +1713,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
     }
 
     function addRow() {
+      markManualEdit();
       const nextNum = currentData.length + 1;
       if (chartType === &#x27;g&#x27;) {
         let nextDateStr = &#x27;2026/06/15&#x27;;
@@ -1608,6 +1735,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
     }
 
     function deleteRow(index) {
+      markManualEdit();
       currentData.splice(index, 1);
       if (chartType === &#x27;g&#x27;) {
         recalculateRareEventIntervals();
@@ -1617,6 +1745,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
     }
 
     function clearTable() {
+      clearLinkedIndicator();
       currentData = [];
       renderDataTable();
       recalculateAndRender();
@@ -2383,7 +2512,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
 
       lastRenderedPrimarySVG = renderOfflineSPCChart({
         containerId: &#x27;chartContainer&#x27;,
-        title: `${chartTitleMap[chartType]}${dateRangeStr}`,
+        title: `${linkedIndicator ? linkedIndicator.code + &#x27; &#x27; + linkedIndicator.name + &#x27;｜&#x27; : &#x27;&#x27;}${chartTitleMap[chartType]}${dateRangeStr}`,
         labels: stats.labels,
         values: stats.x,
         cl: stats.cl,
@@ -2670,6 +2799,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
         }
 
         currentData = parsedData;
+        clearLinkedIndicator();
         if (chartType === &#x27;g&#x27;) recalculateRareEventIntervals();
         renderDataTable();
         recalculateAndRender();
@@ -3041,7 +3171,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
 
       const now = new Date();
       const timeStamp = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,&#x27;0&#x27;)}${now.getDate().toString().padStart(2,&#x27;0&#x27;)}_${now.getHours().toString().padStart(2,&#x27;0&#x27;)}${now.getMinutes().toString().padStart(2,&#x27;0&#x27;)}`;
-      const filename = `醫院臨床品管SPC管制圖_${timeStamp}.png`;
+      const filename = `醫院臨床品管SPC管制圖_${linkedIndicator ? linkedIndicator.code + &#x27;_&#x27; : &#x27;&#x27;}${timeStamp}.png`;
 
       try {
         const exportW = 1200;
@@ -3545,9 +3675,35 @@ function renderOverview(){
   $('o-lede').innerHTML=`2024年1月–2026年9月，本院 <b>${all.length}</b> 支每月皆有分子分母的指標中，<b>${all.filter(x=>x.out_n>0).length}</b> 支曾有月份超出管制界限，<b>${all.filter(x=>x.recent).length}</b> 支在 2026 年出現特殊原因變異。`;
 }
 function oMove(d){const rows=oRows();if(!rows.length)return;const i=rows.findIndex(r=>r.code===os.code);os.code=rows[(i<0?0:i+d+rows.length)%rows.length].code;renderOverview();const tr=document.querySelector('#o-body tr.sel');if(tr)tr.scrollIntoView({block:'nearest'})}
+let ntuPending=null;
+function ntuCatalog(){return Object.entries(SP.codes).map(([code,o])=>({code,name:o.n,group:o.g,unit:o.u}))}
+function ntuPayload(code){
+  const o=SP.codes[code];if(!o)return null;
+  const type=o.u==='一般'?'imr':o.u==='‰'?'u':'p';
+  const data=[];
+  SP.months.forEach((m,i)=>{const n=o.num[i],d=o.den[i];if(n==null||d==null||!(d>0))return;
+    const month=m.replace('-','/');
+    data.push(type==='imr'?{month,num:+(n/d).toFixed(4),den:1}:{month,num:n,den:d})});
+  const baseline=data.filter(r=>r.month<'2026').length;
+  const p2=data.filter(r=>r.month>='2026');
+  const phase2Label=p2.length?`${p2[0].month}–${p2[p2.length-1].month}`:'';
+  return {code,name:o.n,group:o.g,unit:o.u,chartType:type,data,baseline:(baseline>=2&&p2.length?baseline:0),phase2Label};
+}
+function ntuLoadCode(code,switchView){
+  const pl=ntuPayload(code);if(!pl)return;
+  const w=$('ntu-frame').contentWindow;
+  if(w&&typeof w.loadExternalIndicator==='function'){w.loadExternalIndicator(pl)}else{ntuPending=pl}
+  if(switchView!==false){setView('ntu');$('view-ntu').scrollIntoView({block:'start'})}
+  setTimeout(ntuFit,50);
+}
+function ntuGoOverview(code){
+  if(!SP.codes[code])return;
+  os.code=code;os.group='';os.q='';os.only=false;os.rule='';$('o-rule').value='';$('o-group').value='';$('o-q').value='';$('o-only').checked=false;
+  setView('spc');window.scrollTo(0,0);
+}
 function ntuFit(){const f=$('ntu-frame');try{const d=f.contentDocument;if(d&&d.body){const h=Math.ceil(d.body.getBoundingClientRect().height);if(h>0)f.style.height=h+'px'}}catch(e){}}
 function ntuShow(){const f=$('ntu-frame');try{const w=f.contentWindow;if(w&&typeof w.recalculateAndRender==='function')w.recalculateAndRender()}catch(e){}ntuFit()}
-function initNtu(){const f=$('ntu-frame');const hook=()=>{try{const d=f.contentDocument;if(window.ResizeObserver&&d&&d.body)new ResizeObserver(ntuFit).observe(d.body);}catch(e){}if(!$('view-ntu').hidden)ntuShow();else ntuFit()};if(f.contentDocument&&f.contentDocument.readyState==='complete'&&f.contentDocument.body&&f.contentDocument.body.childElementCount)hook();else f.addEventListener('load',hook)}
+function initNtu(){const f=$('ntu-frame');const hook=()=>{try{const w=f.contentWindow;if(w&&typeof w.setIndicatorCatalog==='function')w.setIndicatorCatalog(ntuCatalog());if(ntuPending&&w&&typeof w.loadExternalIndicator==='function'){w.loadExternalIndicator(ntuPending);ntuPending=null}}catch(e){}try{const d=f.contentDocument;if(window.ResizeObserver&&d&&d.body)new ResizeObserver(ntuFit).observe(d.body);}catch(e){}if(!$('view-ntu').hidden)ntuShow();else ntuFit()};if(f.contentDocument&&f.contentDocument.readyState==='complete'&&f.contentDocument.body&&f.contentDocument.body.childElementCount)hook();else f.addEventListener('load',hook)}
 function setView(v){if(!['q','spc','ntu'].includes(v))v='q';try{history.replaceState(null,'',v==='q'?location.pathname+location.search:'#'+v)}catch(e){}document.querySelectorAll('.viewtab').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));$('view-q').hidden=v!=='q';$('view-spc').hidden=v!=='spc';$('view-ntu').hidden=v!=='ntu';if(v==='spc')renderOverview();else if(v==='ntu')ntuShow();else if(ps.ind)renderPfmChart()}
 function initSpc(){
   $('inds').addEventListener('click',e=>{const b=e.target.closest('.spcbtn');if(b){e.stopPropagation();openInd(b.dataset.i)}});
@@ -3562,6 +3718,8 @@ function initSpc(){
   $('o-only').addEventListener('change',e=>{os.only=e.target.checked;renderOverview()});
   $('o-rule').addEventListener('change',e=>{os.rule=e.target.value;renderOverview()});
   $('o-body').addEventListener('click',e=>{const tr=e.target.closest('tr[data-code]');if(tr){os.code=tr.dataset.code;renderOverview()}});
+  $('o-ntu').addEventListener('click',()=>ntuLoadCode(os.code));
+  $('spc-ntu').addEventListener('click',()=>{if(ps.code)ntuLoadCode(ps.code)});
   $('o-prev').addEventListener('click',()=>oMove(-1));$('o-next').addEventListener('click',()=>oMove(1));
   $('o-list').addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();oMove(e.key==='ArrowDown'?1:-1)}});
   let t;window.addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(()=>{if(!$('view-spc').hidden)renderOverview();else if(ps.ind)renderPfmChart()},150)});
