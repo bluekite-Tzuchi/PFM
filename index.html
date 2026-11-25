@@ -237,6 +237,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
 <nav class="views" aria-label="切換頁面">
   <button type="button" class="viewtab" data-v="q" aria-pressed="true">PFM 評鑑情境查詢</button>
   <button type="button" class="viewtab" data-v="spc" aria-pressed="false">管制圖總覽（158 支指標）</button>
+  <button type="button" class="viewtab" data-v="ntu" aria-pressed="false">SPC 管制圖分析系統</button>
 </nav>
 <div class="view" id="view-q">
 
@@ -376,6 +377,2706 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
       </dl>
     </details>
   </section>
+</div>
+<div class="view" id="view-ntu" hidden>
+  <iframe id="ntu-frame" title="醫院臨床品質指標 SPC 管制圖分析系統" style="width:100%;height:1600px;border:0;border-radius:12px;display:block;background:#f1f5f9;color-scheme:light" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;zh-Hant&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot; /&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; /&gt;
+  &lt;title&gt;醫院臨床品質指標 SPC 管制圖分析系統 (單機離線版)&lt;/title&gt;
+  &lt;style&gt;
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: &#x27;Inter&#x27;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, &quot;Helvetica Neue&quot;, Arial, &quot;Noto Sans TC&quot;, &quot;Microsoft JhengHei&quot;, sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+    }
+
+    /* 頂部導航列 */
+    header {
+      background: linear-gradient(90deg, #0f172a 0%, #172554 50%, #0f172a 100%);
+      color: #ffffff;
+      box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.15);
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+    .header-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0.875rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand-icon {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(96, 165, 250, 0.3);
+      padding: 0.5rem;
+      border-radius: 0.75rem;
+      color: #93c5fd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .brand-title {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+    }
+    .brand-sub {
+      margin: 0;
+      font-size: 0.75rem;
+      color: rgba(191, 219, 254, 0.85);
+    }
+    .offline-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      color: #6ee7b7;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 9999px;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* 按鈕樣式 */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.5rem 0.875rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .btn-indigo {
+      background-color: #4f46e5;
+      color: #ffffff;
+    }
+    .btn-indigo:hover { background-color: #4338ca; }
+    .btn-emerald {
+      background-color: #059669;
+      color: #ffffff;
+    }
+    .btn-emerald:hover { background-color: #047857; }
+    .btn-sm-blue {
+      padding: 0.375rem 0.625rem;
+      font-size: 0.75rem;
+      background-color: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      box-shadow: none;
+    }
+    .btn-sm-blue:hover { background-color: #dbeafe; }
+    .btn-sm-rose {
+      padding: 0.375rem 0.625rem;
+      font-size: 0.75rem;
+      background-color: #fff1f2;
+      color: #e11d48;
+      border: 1px solid #fecdd3;
+      box-shadow: none;
+    }
+    .btn-sm-rose:hover { background-color: #ffe4e6; }
+
+    /* 主容器與卡片 */
+    main {
+      flex: 1;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .glass-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 1rem;
+      padding: 1.25rem;
+      box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.03);
+    }
+
+    /* 網格佈局 */
+    .control-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+    .col-span-4 { grid-column: span 4 / span 4; }
+    .col-span-8 { grid-column: span 8 / span 8; }
+    .col-divider {
+      border-left: 1px solid #e2e8f0;
+      padding-left: 1.5rem;
+    }
+    @media (max-width: 1024px) {
+      .col-span-4, .col-span-8 { grid-column: span 12 / span 12; }
+      .col-divider {
+        border-left: none;
+        border-top: 1px solid #e2e8f0;
+        padding-left: 0;
+        padding-top: 1rem;
+      }
+    }
+
+    .section-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      margin-bottom: 0.625rem;
+    }
+    select, input[type=&quot;number&quot;], input[type=&quot;text&quot;] {
+      font-family: inherit;
+    }
+    .form-select {
+      width: 100%;
+      border-radius: 0.75rem;
+      border: 1px solid #cbd5e1;
+      background-color: #f8fafc;
+      padding: 0.625rem 0.875rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #1e293b;
+      transition: all 0.15s;
+    }
+    .form-select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+    .desc-box {
+      margin-top: 0.625rem;
+      font-size: 0.75rem;
+      color: #475569;
+      background-color: rgba(239, 246, 255, 0.75);
+      border: 1px solid #dbeafe;
+      border-radius: 0.5rem;
+      padding: 0.625rem;
+      line-height: 1.55;
+    }
+
+    /* 分期鎖定與自訂 CL */
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .check-row input[type=&quot;checkbox&quot;] {
+      width: 1rem;
+      height: 1rem;
+      cursor: pointer;
+      accent-color: #2563eb;
+    }
+    .check-row label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #1e293b;
+      cursor: pointer;
+      user-select: none;
+    }
+    .inline-input-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      transition: opacity 0.2s;
+    }
+    .disabled-group {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+    .num-input-sm {
+      width: 5.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid #cbd5e1;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      text-align: center;
+      color: #1d4ed8;
+      background: #ffffff;
+    }
+    .num-input-md {
+      width: 8rem;
+      border-radius: 0.5rem;
+      border: 1px solid #cbd5e1;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #047857;
+      background: #ffffff;
+    }
+    .hint-text {
+      font-size: 0.7rem;
+      color: #64748b;
+      margin: 0.25rem 0 0 0;
+      line-height: 1.4;
+    }
+    .sub-divider {
+      margin-top: 0.75rem;
+      padding-top: 0.625rem;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    /* 檔案拖曳上傳區 */
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      background-color: rgba(248, 250, 252, 0.8);
+      border-radius: 0.75rem;
+      padding: 0.875rem;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.15s;
+    }
+    .drop-zone:hover, .drop-zone.drag-active {
+      border-color: #3b82f6;
+      background-color: rgba(239, 246, 255, 0.6);
+    }
+    .drop-zone input[type=&quot;file&quot;] {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .drop-zone-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: #1d4ed8;
+      font-weight: 600;
+      font-size: 0.8125rem;
+    }
+    .upload-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
+      gap: 0.5rem;
+    }
+    .link-btn {
+      background: none;
+      border: none;
+      color: #2563eb;
+      font-weight: 600;
+      font-size: 0.75rem;
+      cursor: pointer;
+      padding: 0;
+    }
+    .link-btn:hover { text-decoration: underline; color: #1e40af; }
+
+    /* Nelson Rules 網格 */
+    .rules-section {
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+    }
+    .rules-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.625rem;
+    }
+    .rules-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .dot-rose {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 9999px;
+      background-color: #f43f5e;
+      display: inline-block;
+    }
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.5rem;
+      font-size: 0.75rem;
+    }
+    @media (max-width: 1024px) {
+      .rules-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px) {
+      .rules-grid { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    }
+    .rule-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: #f8fafc;
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      color: #334155;
+      transition: background-color 0.15s;
+    }
+    .rule-item:hover { background-color: #f1f5f9; }
+    .rule-item input { accent-color: #e11d48; cursor: pointer; }
+
+    /* 數據表格 */
+    .table-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .table-container {
+      overflow-y: auto;
+      max-height: 560px;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.75rem;
+    }
+    .table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+    .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    table.data-grid {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.75rem;
+    }
+    table.data-grid thead {
+      background-color: #f1f5f9;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      color: #475569;
+      font-weight: 600;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    table.data-grid th, table.data-grid td {
+      padding: 0.45rem 0.5rem;
+    }
+    table.data-grid tbody tr {
+      border-bottom: 1px solid #f1f5f9;
+    }
+    table.data-grid tbody tr:hover {
+      background-color: rgba(239, 246, 255, 0.5);
+    }
+    .cell-input {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 0.375rem;
+      padding: 0.25rem 0.375rem;
+      font-size: 0.75rem;
+      color: #1e293b;
+    }
+    .cell-input:hover:not(:disabled) { border-color: #cbd5e1; }
+    .cell-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background: #ffffff;
+    }
+    .cell-input:disabled {
+      color: #cbd5e1;
+      cursor: not-allowed;
+    }
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+    .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+
+    /* 圖表區塊與圖例 */
+    .chart-top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.875rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #334155;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+    .chart-box {
+      width: 100%;
+      position: relative;
+      user-select: none;
+    }
+    .secondary-chart-box {
+      width: 100%;
+      position: relative;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 1rem;
+      margin-top: 0.75rem;
+      user-select: none;
+    }
+
+    /* 懸停數據提示框 (Tooltip) */
+    .spc-tooltip {
+      position: fixed;
+      z-index: 60;
+      pointer-events: none;
+      background: rgba(15, 23, 42, 0.95);
+      color: #f8fafc;
+      padding: 0.625rem 0.875rem;
+      border-radius: 0.625rem;
+      font-size: 0.75rem;
+      line-height: 1.5;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      max-width: 280px;
+      display: none;
+    }
+
+    /* 診斷清單與通知橫幅 */
+    .badge-ok {
+      padding: 0.2rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    .badge-warn {
+      padding: 0.2rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+    .alert-banner {
+      max-width: 1280px;
+      margin: 1rem auto 0 auto;
+      padding: 0 1.5rem;
+      width: 100%;
+    }
+    .alert-inner {
+      background-color: #fef2f2;
+      border-left: 4px solid #ef4444;
+      color: #991b1b;
+      padding: 0.875rem 1rem;
+      border-radius: 0 0.75rem 0.75rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    .toast-banner {
+      position: fixed;
+      top: 5rem;
+      right: 1.25rem;
+      z-index: 50;
+      max-width: 26rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      font-size: 0.875rem;
+      font-weight: 600;
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+    .toast-ok {
+      background-color: #ecfdf5;
+      border: 1px solid #6ee7b7;
+      color: #065f46;
+    }
+    .toast-err {
+      background-color: #fef2f2;
+      border: 1px solid #fca5a5;
+      color: #991b1b;
+    }
+    .hidden { display: none !important; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  &lt;/style&gt;
+&lt;style&gt;body{min-height:0!important;font-family:Arial,&quot;Microsoft JhengHei&quot;,&quot;微軟正黑體&quot;,&quot;PingFang TC&quot;,&quot;Noto Sans TC&quot;,sans-serif!important}header{position:static!important}&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;!-- 頂部系統導航列 --&gt;
+  &lt;header&gt;
+    &lt;div class=&quot;header-inner&quot;&gt;
+      &lt;div class=&quot;brand-box&quot;&gt;
+        &lt;div class=&quot;brand-icon&quot;&gt;
+          &lt;svg width=&quot;26&quot; height=&quot;26&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; viewBox=&quot;0 0 24 24&quot;&gt;
+            &lt;path stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; d=&quot;M3 13h3l2-6 4 12 3-8 2 2h4&quot;&gt;&lt;/path&gt;
+          &lt;/svg&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;h1 class=&quot;brand-title&quot;&gt;
+            醫院臨床品質指標 SPC 管制圖分析系統
+            &lt;span class=&quot;offline-badge&quot;&gt;● 單機離線版就緒&lt;/span&gt;
+          &lt;/h1&gt;
+          &lt;p class=&quot;brand-sub&quot;&gt;Clinical SPC Dashboard &amp;amp; Nelson 8 Rules Automated Engine (Zero-Dependency Offline Edition)&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;header-actions&quot;&gt;
+        &lt;button onclick=&quot;loadDefaultFallCase()&quot; class=&quot;btn btn-indigo&quot;&gt;
+          &lt;svg width=&quot;16&quot; height=&quot;16&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; viewBox=&quot;0 0 24 24&quot;&gt;
+            &lt;path stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; d=&quot;M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15&quot;&gt;&lt;/path&gt;
+          &lt;/svg&gt;
+          載入跌倒率示範教案
+        &lt;/button&gt;
+
+        &lt;button onclick=&quot;exportChartPNG()&quot; class=&quot;btn btn-emerald&quot;&gt;
+          &lt;svg width=&quot;16&quot; height=&quot;16&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; viewBox=&quot;0 0 24 24&quot;&gt;
+            &lt;path stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; d=&quot;M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4&quot;&gt;&lt;/path&gt;
+          &lt;/svg&gt;
+          匯出圖表 (PNG)
+        &lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/header&gt;
+
+  &lt;!-- 全局系統通知橫幅 --&gt;
+  &lt;div id=&quot;toastBanner&quot; class=&quot;toast-banner hidden&quot;&gt;&lt;/div&gt;
+
+  &lt;!-- 異常或防呆警告提示橫幅 --&gt;
+  &lt;div id=&quot;alertBanner&quot; class=&quot;alert-banner hidden&quot;&gt;
+    &lt;div class=&quot;alert-inner&quot;&gt;
+      &lt;div style=&quot;display:flex;align-items:center;gap:0.625rem;&quot;&gt;
+        &lt;svg width=&quot;20&quot; height=&quot;20&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 20 20&quot; style=&quot;flex-shrink:0;color:#ef4444;&quot;&gt;
+          &lt;path fill-rule=&quot;evenodd&quot; d=&quot;M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z&quot; clip-rule=&quot;evenodd&quot; /&gt;
+        &lt;/svg&gt;
+        &lt;span id=&quot;alertMessage&quot;&gt;&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;button onclick=&quot;hideAlert()&quot; style=&quot;background:none;border:none;color:#dc2626;font-weight:bold;font-size:1.25rem;cursor:pointer;padding:0 0.5rem;&quot;&gt;&amp;times;&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- 懸停數據提示框 --&gt;
+  &lt;div id=&quot;spcTooltip&quot; class=&quot;spc-tooltip&quot;&gt;&lt;/div&gt;
+
+  &lt;!-- 主要內容區 --&gt;
+  &lt;main&gt;
+
+    &lt;!-- 區塊 1：控制中心與參數設定 --&gt;
+    &lt;section class=&quot;glass-card&quot;&gt;
+      &lt;div class=&quot;control-grid&quot;&gt;
+        
+        &lt;!-- 1. 管制圖類型切換 --&gt;
+        &lt;div class=&quot;col-span-4&quot;&gt;
+          &lt;label class=&quot;section-label&quot;&gt;1. 管制圖類型選取 (Chart Type)&lt;/label&gt;
+          &lt;select id=&quot;chartTypeSelect&quot; onchange=&quot;handleChartTypeChange()&quot; class=&quot;form-select&quot;&gt;
+            &lt;optgroup label=&quot;計數值管制圖 (Attributes)&quot;&gt;
+              &lt;option value=&quot;u&quot; selected&gt;u 圖：單位缺點數 (跌倒率/感染密度，分母浮動)&lt;/option&gt;
+              &lt;option value=&quot;p&quot;&gt;p 圖：不良率 (調劑疏失率/再入院率，二項分佈)&lt;/option&gt;
+              &lt;option value=&quot;c&quot;&gt;c 圖：缺點數 (固定檢驗單位，如每月針扎件數)&lt;/option&gt;
+              &lt;option value=&quot;np&quot;&gt;np 圖：不良數 (固定樣本數，如每日抽審病歷)&lt;/option&gt;
+              &lt;option value=&quot;g&quot;&gt;g 圖：罕見事件間隔時間 (輸入事件日期自動算間隔天數)&lt;/option&gt;
+            &lt;/optgroup&gt;
+            &lt;optgroup label=&quot;計量值管制圖 (Variables)&quot;&gt;
+              &lt;option value=&quot;imr&quot;&gt;I-MR 圖：個別值與移動全距圖 (n=1，如急診停留時間)&lt;/option&gt;
+              &lt;option value=&quot;xbar-r&quot;&gt;Xbar-R 圖：平均值與全距圖 (固定子群多次抽樣)&lt;/option&gt;
+            &lt;/optgroup&gt;
+          &lt;/select&gt;
+          &lt;div id=&quot;chartTypeDesc&quot; class=&quot;desc-box&quot;&gt;
+            &lt;strong&gt;u 圖適用&lt;/strong&gt;：分母（如住院人日、導尿管人日）每月變動之事件密度指標，UCL/LCL 呈階梯狀。
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 2. 改善前後分期比較 (Phase I / Phase II) --&gt;
+        &lt;div class=&quot;col-span-4 col-divider&quot;&gt;
+          &lt;label class=&quot;section-label&quot;&gt;2. 改善前後分期比較 (Phase I / Phase II)&lt;/label&gt;
+          &lt;div class=&quot;check-row&quot;&gt;
+            &lt;input type=&quot;checkbox&quot; id=&quot;baselineLockCheck&quot; onchange=&quot;toggleBaselineLock()&quot;&gt;
+            &lt;label for=&quot;baselineLockCheck&quot;&gt;啟用改善前後分期比較 (Phase I / II)&lt;/label&gt;
+          &lt;/div&gt;
+          
+          &lt;div id=&quot;baselineInputGroup&quot; class=&quot;inline-input-group disabled-group&quot;&gt;
+            &lt;span style=&quot;font-size:0.75rem;font-weight:500;color:#475569;&quot;&gt;改善前期：前&lt;/span&gt;
+            &lt;input type=&quot;number&quot; id=&quot;baselineCount&quot; value=&quot;12&quot; min=&quot;2&quot; max=&quot;100&quot; onchange=&quot;recalculateAndRender()&quot; class=&quot;num-input-sm&quot;&gt;
+            &lt;span style=&quot;font-size:0.75rem;font-weight:500;color:#475569;&quot;&gt;筆數據為改善前期 (Phase I)&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;p class=&quot;hint-text&quot;&gt;
+            * 取消勾選時為全期動態重算；勾選時以前 N 期數據計算改善前期 (Phase I) 界限，後續期數則以改善後期 (Phase II) 數據獨立計算中心線與管制界限。
+          &lt;/p&gt;
+
+          &lt;!-- 自訂穩定平均值 (管制用管制圖標準中心線) --&gt;
+          &lt;div class=&quot;sub-divider&quot;&gt;
+            &lt;div class=&quot;check-row&quot; style=&quot;margin-bottom:0.35rem;&quot;&gt;
+              &lt;input type=&quot;checkbox&quot; id=&quot;customClCheck&quot; onchange=&quot;toggleCustomCl()&quot; style=&quot;accent-color:#059669;&quot;&gt;
+              &lt;label for=&quot;customClCheck&quot; style=&quot;font-size:0.75rem;font-weight:700;&quot;&gt;自訂穩定平均值 (固定中心線 CL)&lt;/label&gt;
+            &lt;/div&gt;
+            &lt;div id=&quot;customClInputGroup&quot; class=&quot;inline-input-group disabled-group&quot; style=&quot;margin-bottom:0;&quot;&gt;
+              &lt;span style=&quot;font-size:0.75rem;font-weight:500;color:#475569;&quot;&gt;中心線 CL：&lt;/span&gt;
+              &lt;input type=&quot;number&quot; id=&quot;customClValue&quot; step=&quot;any&quot; placeholder=&quot;輸入穩定平均值&quot; onchange=&quot;recalculateAndRender()&quot; class=&quot;num-input-md&quot;&gt;
+              &lt;span id=&quot;customClUnitHint&quot; style=&quot;font-size:0.7rem;color:#64748b;&quot;&gt;(如 u值 0.0007)&lt;/span&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 3. 離線 CSV / Excel 檔案匯入與範本下載 --&gt;
+        &lt;div class=&quot;col-span-4 col-divider&quot;&gt;
+          &lt;label class=&quot;section-label&quot;&gt;3. 外部資料匯入 (Excel / CSV 離線支援)&lt;/label&gt;
+          &lt;div id=&quot;dropZone&quot; class=&quot;drop-zone&quot;&gt;
+            &lt;input type=&quot;file&quot; id=&quot;fileInput&quot; accept=&quot;.xlsx,.xls,.csv,.txt,.xml&quot; onchange=&quot;handleFileUpload(event)&quot; /&gt;
+            &lt;div class=&quot;drop-zone-label&quot;&gt;
+              &lt;svg width=&quot;20&quot; height=&quot;20&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; viewBox=&quot;0 0 24 24&quot;&gt;
+                &lt;path stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; d=&quot;M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12&quot;&gt;&lt;/path&gt;
+              &lt;/svg&gt;
+              &lt;span&gt;選擇或拖曳 Excel (.xlsx/.xls) / CSV 檔案&lt;/span&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;upload-footer&quot;&gt;
+            &lt;span id=&quot;excelFormatHint&quot; style=&quot;color:#64748b;&quot;&gt;欄位順序：時間 | 分子/數值 | 分母/子群&lt;/span&gt;
+            &lt;button onclick=&quot;generateTemplateExcel()&quot; class=&quot;link-btn&quot;&gt;下載離線標準 Excel 範本&lt;/button&gt;
+          &lt;/div&gt;
+          &lt;p class=&quot;hint-text&quot; style=&quot;margin-top:0.35rem;&quot;&gt;
+            * 內建 100% 離線解析引擎，完整支援 &lt;strong&gt;.xlsx&lt;/strong&gt;、&lt;strong&gt;.xls&lt;/strong&gt; 與 &lt;strong&gt;.csv&lt;/strong&gt; 檔案直接匯入。
+          &lt;/p&gt;
+        &lt;/div&gt;
+
+      &lt;/div&gt;
+
+      &lt;!-- Nelson Rules 8 大規則勾選列 --&gt;
+      &lt;div class=&quot;rules-section&quot;&gt;
+        &lt;div class=&quot;rules-header&quot;&gt;
+          &lt;span class=&quot;rules-title&quot;&gt;
+            &lt;span class=&quot;dot-rose&quot;&gt;&lt;/span&gt;
+            NELSON RULES 8 大變異判讀引擎（可依醫院品管指標自訂啟用規則）
+          &lt;/span&gt;
+          &lt;div style=&quot;font-size:0.75rem;&quot;&gt;
+            &lt;button onclick=&quot;toggleAllRules(true)&quot; class=&quot;link-btn&quot;&gt;全選&lt;/button&gt;
+            &lt;span style=&quot;color:#cbd5e1;margin:0 0.35rem;&quot;&gt;|&lt;/span&gt;
+            &lt;button onclick=&quot;toggleAllRules(false)&quot; class=&quot;link-btn&quot; style=&quot;color:#64748b;&quot;&gt;全清&lt;/button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;rules-grid&quot;&gt;
+          &lt;label class=&quot;rule-item&quot;&gt;
+            &lt;input type=&quot;checkbox&quot; id=&quot;rule1&quot; checked onchange=&quot;recalculateAndRender()&quot;&gt;
+            &lt;span&gt;&lt;strong&gt;Rule 1:&lt;/strong&gt; 1點超出 3σ (超界)&lt;/span&gt;
+          &lt;/label&gt;
+          &lt;label class=&quot;rule-item&quot;&gt;
+            &lt;input type=&quot;checkbox&quot; id=&quot;rule2&quot; checked onchange=&quot;recalculateAndRender()&quot;&gt;
+            &lt;span&gt;&lt;strong&gt;Rule 2:&lt;/strong&gt; 連續9點在同側 (漂移)&lt;/span&gt;
+          &lt;/label&gt;
+          &lt;label class=&quot;rule-item&quot;&gt;
+            &lt;input type=&quot;checkbox&quot; id=&quot;rule3&quot; checked onchange=&quot;recalculateAndRender()&quot;&gt;
+            &lt;span&gt;&lt;strong&gt;Rule 3:&lt;/strong&gt; 連續6點單向上升/降 (趨勢)&lt;/span&gt;
+          &lt;/label&gt;
+          &lt;label class=&quot;rule-item&quot;&gt;
+            &lt;input type=&quot;checkbox&quot; id=&quot;rule4&quot; checked onchange=&quot;recalculateAndRender()&quot;&gt;
+            &lt;span&gt;&lt;strong&gt;Rule 4:&lt;/strong&gt; 連續14點上下交替鋸齒&lt;/span&gt;
+          &lt;/label&gt;
+          &lt;label class=&quot;rule-item&quot;&gt;
+            &lt;input type=&quot;checkbox&quot; id=&quot;rule5&quot; checked onchange=&quot;recalculateAndRender()&quot;&gt;
+            &lt;span&gt;&lt;strong&gt;Rule 5:&lt;/strong&gt; 連續3點有2點 &amp;gt; 2σ (Zone A)&lt;/span&gt;
+          &lt;/label&gt;
+          &lt;label class=&quot;rule-item&quot;&gt;
+            &lt;input type=&quot;checkbox&quot; id=&quot;rule6&quot; checked onchange=&quot;recalculateAndRender()&quot;&gt;
+            &lt;span&gt;&lt;strong&gt;Rule 6:&lt;/strong&gt; 連續5點有4點 &amp;gt; 1σ (Zone B)&lt;/span&gt;
+          &lt;/label&gt;
+          &lt;label class=&quot;rule-item&quot;&gt;
+            &lt;input type=&quot;checkbox&quot; id=&quot;rule7&quot; checked onchange=&quot;recalculateAndRender()&quot;&gt;
+            &lt;span&gt;&lt;strong&gt;Rule 7:&lt;/strong&gt; 連續15點在 1σ 內 (過度集中)&lt;/span&gt;
+          &lt;/label&gt;
+          &lt;label class=&quot;rule-item&quot;&gt;
+            &lt;input type=&quot;checkbox&quot; id=&quot;rule8&quot; checked onchange=&quot;recalculateAndRender()&quot;&gt;
+            &lt;span&gt;&lt;strong&gt;Rule 8:&lt;/strong&gt; 連續8點在 1σ 以外 (雙峰分層)&lt;/span&gt;
+          &lt;/label&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;!-- 區塊 2：左右分欄 - 左側可編輯表格 / 右側離線向量圖表 --&gt;
+    &lt;div class=&quot;control-grid&quot; style=&quot;align-items:start;&quot;&gt;
+      
+      &lt;!-- 左側：線上可編輯表格 (Editable Grid) --&gt;
+      &lt;div class=&quot;col-span-4 glass-card&quot; style=&quot;padding:1rem;&quot;&gt;
+        &lt;div class=&quot;table-header-bar&quot;&gt;
+          &lt;div&gt;
+            &lt;h2 style=&quot;margin:0;font-size:0.875rem;font-weight:700;color:#1e293b;&quot;&gt;臨床指標數據表格&lt;/h2&gt;
+            &lt;p style=&quot;margin:0;font-size:0.75rem;color:#64748b;&quot;&gt;雙擊或直接修改數值，圖表即時聯動&lt;/p&gt;
+          &lt;/div&gt;
+          &lt;div style=&quot;display:flex;gap:0.375rem;&quot;&gt;
+            &lt;button onclick=&quot;addRow()&quot; class=&quot;btn btn-sm-blue&quot;&gt;+ 新增列&lt;/button&gt;
+            &lt;button onclick=&quot;clearTable()&quot; class=&quot;btn btn-sm-rose&quot;&gt;清空&lt;/button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;table-container&quot;&gt;
+          &lt;table class=&quot;data-grid&quot;&gt;
+            &lt;thead&gt;
+              &lt;tr&gt;
+                &lt;th class=&quot;text-center&quot; style=&quot;width:2.5rem;&quot;&gt;項次&lt;/th&gt;
+                &lt;th&gt;月份 / 時間&lt;/th&gt;
+                &lt;th id=&quot;colNumHeader&quot; class=&quot;text-right&quot;&gt;分子 (件數)&lt;/th&gt;
+                &lt;th id=&quot;colDenHeader&quot; class=&quot;text-right&quot;&gt;分母 (人日數)&lt;/th&gt;
+                &lt;th class=&quot;text-center&quot; style=&quot;width:2.5rem;&quot;&gt;操作&lt;/th&gt;
+              &lt;/tr&gt;
+            &lt;/thead&gt;
+            &lt;tbody id=&quot;dataTableBody&quot;&gt;
+              &lt;!-- JS 動態產生數據列 --&gt;
+            &lt;/tbody&gt;
+          &lt;/table&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;!-- 右側：SPC 管制圖視圖區 --&gt;
+      &lt;div class=&quot;col-span-8&quot; style=&quot;display:flex;flex-direction:column;gap:1.5rem;&quot;&gt;
+        &lt;div class=&quot;glass-card&quot;&gt;
+          &lt;div class=&quot;chart-top-bar&quot;&gt;
+            &lt;div&gt;
+              &lt;h2 style=&quot;margin:0;font-size:1rem;font-weight:700;color:#1e293b;&quot;&gt;臨床品質指標管制圖&lt;/h2&gt;
+              &lt;p style=&quot;margin:0;font-size:0.75rem;color:#64748b;&quot;&gt;Centerline &amp;amp; 3-Sigma Control Limits with Nelson Violations&lt;/p&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;legend-row&quot;&gt;
+              &lt;span class=&quot;legend-item&quot;&gt;&lt;span style=&quot;width:10px;height:10px;border-radius:9999px;background:#2563eb;display:inline-block;&quot;&gt;&lt;/span&gt;流程穩定點&lt;/span&gt;
+              &lt;span class=&quot;legend-item&quot;&gt;&lt;span style=&quot;width:10px;height:10px;transform:rotate(45deg);background:#dc2626;display:inline-block;&quot;&gt;&lt;/span&gt;特殊原因變異 (異常)&lt;/span&gt;
+              &lt;span class=&quot;legend-item&quot;&gt;&lt;span style=&quot;width:14px;height:2px;background:#059669;display:inline-block;&quot;&gt;&lt;/span&gt;CL (中心線)&lt;/span&gt;
+              &lt;span class=&quot;legend-item&quot;&gt;&lt;span style=&quot;width:14px;height:0;border-top:2px dashed #ef4444;display:inline-block;&quot;&gt;&lt;/span&gt;UCL / LCL&lt;/span&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+
+          &lt;!-- 主要圖表容器 (純離線 SVG 互動繪圖引擎) --&gt;
+          &lt;div id=&quot;chartContainer&quot; class=&quot;chart-box&quot;&gt;&lt;/div&gt;
+
+          &lt;!-- 次要圖表容器 (I-MR 的 MR 圖或 Xbar-R 的 R 圖) --&gt;
+          &lt;div id=&quot;secondaryChartContainer&quot; class=&quot;secondary-chart-box hidden&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 變異診斷反饋面板 (Diagnostic Feedback) --&gt;
+        &lt;div class=&quot;glass-card&quot;&gt;
+          &lt;div style=&quot;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.5rem;margin-bottom:0.75rem;&quot;&gt;
+            &lt;h3 style=&quot;margin:0;font-size:0.875rem;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:0.5rem;&quot;&gt;
+              &lt;span style=&quot;width:10px;height:10px;border-radius:9999px;background:#ef4444;display:inline-block;&quot;&gt;&lt;/span&gt;
+              特殊原因變異診斷清單 (Nelson Rules Violation Log)
+            &lt;/h3&gt;
+            &lt;span id=&quot;violationBadge&quot; class=&quot;badge-ok&quot;&gt;
+              目前流程受控 (0 項異常)
+            &lt;/span&gt;
+          &lt;/div&gt;
+
+          &lt;div style=&quot;overflow-x:auto;&quot;&gt;
+            &lt;table class=&quot;data-grid&quot;&gt;
+              &lt;thead style=&quot;background:#f8fafc;&quot;&gt;
+                &lt;tr&gt;
+                  &lt;th style=&quot;padding:0.5rem 0.75rem;&quot;&gt;點序號&lt;/th&gt;
+                  &lt;th style=&quot;padding:0.5rem 0.75rem;&quot;&gt;時間/月份&lt;/th&gt;
+                  &lt;th class=&quot;text-right&quot; style=&quot;padding:0.5rem 0.75rem;&quot;&gt;觀測指標值&lt;/th&gt;
+                  &lt;th class=&quot;text-right&quot; style=&quot;padding:0.5rem 0.75rem;&quot;&gt;中心線 (CL)&lt;/th&gt;
+                  &lt;th class=&quot;text-right&quot; style=&quot;padding:0.5rem 0.75rem;&quot;&gt;標準化偏離 (Z-Score)&lt;/th&gt;
+                  &lt;th style=&quot;padding:0.5rem 0.75rem;&quot;&gt;觸發之 Nelson 規則與臨床詮釋&lt;/th&gt;
+                &lt;/tr&gt;
+              &lt;/thead&gt;
+              &lt;tbody id=&quot;diagnosticTableBody&quot;&gt;
+                &lt;tr&gt;
+                  &lt;td colspan=&quot;6&quot; class=&quot;text-center&quot; style=&quot;padding:1.5rem;color:#94a3b8;&quot;&gt;所有數據點皆落在統計管制界限內，無特殊原因變異。&lt;/td&gt;
+                &lt;/tr&gt;
+              &lt;/tbody&gt;
+            &lt;/table&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+    &lt;/div&gt;
+  &lt;/main&gt;
+
+  &lt;!-- 核心 SPC 與純離線繪圖/試算表引擎 --&gt;
+  &lt;script&gt;
+    // --- 1. 全域狀態管理 ---
+    let currentData = [];
+    let chartType = &#x27;u&#x27;; // 預設 u 圖 (一般病房住院病人跌倒率)
+    let lastRenderedPrimarySVG = null;
+    let lastRenderedSecondarySVG = null;
+
+    // 內建示範教案數據：一般病房住院病人跌倒率 (2025/01 ~ 2026/06，共18個月)
+    const defaultFallData = [
+      { month: &#x27;2025/01&#x27;, num: 6, den: 8500 },
+      { month: &#x27;2025/02&#x27;, num: 6, den: 7800 },
+      { month: &#x27;2025/03&#x27;, num: 3, den: 7200 },
+      { month: &#x27;2025/04&#x27;, num: 9, den: 8100 },
+      { month: &#x27;2025/05&#x27;, num: 6, den: 7300 },
+      { month: &#x27;2025/06&#x27;, num: 6, den: 8800 },
+      { month: &#x27;2025/07&#x27;, num: 4, den: 7300 },
+      { month: &#x27;2025/08&#x27;, num: 3, den: 8000 },
+      { month: &#x27;2025/09&#x27;, num: 6, den: 8800 },
+      { month: &#x27;2025/10&#x27;, num: 6, den: 8500 },
+      { month: &#x27;2025/11&#x27;, num: 8, den: 8400 },
+      { month: &#x27;2025/12&#x27;, num: 4, den: 7400 },
+      { month: &#x27;2026/01&#x27;, num: 6, den: 8100 },
+      { month: &#x27;2026/02&#x27;, num: 9, den: 8500 },
+      { month: &#x27;2026/03&#x27;, num: 7, den: 7400 },
+      { month: &#x27;2026/04&#x27;, num: 5, den: 7700 },
+      { month: &#x27;2026/05&#x27;, num: 3, den: 7800 },
+      { month: &#x27;2026/06&#x27;, num: 6, den: 7700 }
+    ];
+
+    // 內建罕見事件 g 圖示範教案數據 (手術部位標記異常事件發生日期)
+    const defaultRareEventData = [
+      { month: &#x27;2025/01/05&#x27;, num: 0, den: 1 },
+      { month: &#x27;2025/02/18&#x27;, num: 44, den: 1 },
+      { month: &#x27;2025/03/22&#x27;, num: 32, den: 1 },
+      { month: &#x27;2025/05/10&#x27;, num: 49, den: 1 },
+      { month: &#x27;2025/06/15&#x27;, num: 36, den: 1 },
+      { month: &#x27;2025/08/02&#x27;, num: 48, den: 1 },
+      { month: &#x27;2025/09/11&#x27;, num: 40, den: 1 },
+      { month: &#x27;2025/10/29&#x27;, num: 48, den: 1 },
+      { month: &#x27;2025/12/03&#x27;, num: 35, den: 1 },
+      { month: &#x27;2026/01/20&#x27;, num: 48, den: 1 },
+      { month: &#x27;2026/03/15&#x27;, num: 54, den: 1 },
+      { month: &#x27;2026/05/12&#x27;, num: 58, den: 1 }
+    ];
+
+    // 規則中文說明對照表
+    const NELSON_DESCRIPTIONS = {
+      1: &quot;Rule 1：單點超出 3σ 管制界限（發生突發性特殊原因事件）&quot;,
+      2: &quot;Rule 2：連續 9 點落在中心線同側（流程平均值已發生顯著位移/漂移）&quot;,
+      3: &quot;Rule 3：連續 6 點持續上升或下降（呈現單向惡化或持續改善趨勢）&quot;,
+      4: &quot;Rule 4：連續 14 點上下交替跳動（系統存在過度人工干預或雙重來源干擾）&quot;,
+      5: &quot;Rule 5：連續 3 點中有 2 點落在 Zone A 或以外（同側超過 2σ 警戒區）&quot;,
+      6: &quot;Rule 6：連續 5 點中有 4 點落在 Zone B 或以外（同側超過 1σ 偏移）&quot;,
+      7: &quot;Rule 7：連續 15 點均集中於 Zone C 內（兩側 1σ 內，可能存在數據分層或過度集中）&quot;,
+      8: &quot;Rule 8：連續 8 點均落在 Zone C 以外（兩側均超過 1σ，呈現雙峰分佈異常）&quot;
+    };
+
+    // 標準 SPC 管制圖係數表 (依子群樣本數 n = 2 ~ 15)
+    const SPC_CONSTANTS = {
+      2:  { A2: 1.880, D3: 0,     D4: 3.267, d2: 1.128 },
+      3:  { A2: 1.023, D3: 0,     D4: 2.574, d2: 1.693 },
+      4:  { A2: 0.729, D3: 0,     D4: 2.282, d2: 2.059 },
+      5:  { A2: 0.577, D3: 0,     D4: 2.114, d2: 2.326 },
+      6:  { A2: 0.483, D3: 0,     D4: 2.004, d2: 2.534 },
+      7:  { A2: 0.419, D3: 0.076, D4: 1.924, d2: 2.704 },
+      8:  { A2: 0.373, D3: 0.136, D4: 1.864, d2: 2.847 },
+      9:  { A2: 0.337, D3: 0.184, D4: 1.816, d2: 2.970 },
+      10: { A2: 0.308, D3: 0.223, D4: 1.777, d2: 3.078 },
+      11: { A2: 0.285, D3: 0.256, D4: 1.744, d2: 3.173 },
+      12: { A2: 0.266, D3: 0.283, D4: 1.717, d2: 3.258 },
+      13: { A2: 0.249, D3: 0.307, D4: 1.693, d2: 3.336 },
+      14: { A2: 0.235, D3: 0.328, D4: 1.672, d2: 3.407 },
+      15: { A2: 0.223, D3: 0.347, D4: 1.653, d2: 3.472 }
+    };
+
+    // 友善浮動通知訊息
+    let toastTimer = null;
+    function showToastMessage(msg, isError = false) {
+      const toast = document.getElementById(&#x27;toastBanner&#x27;);
+      toast.textContent = msg;
+      toast.className = `toast-banner ${isError ? &#x27;toast-err&#x27; : &#x27;toast-ok&#x27;}`;
+      toast.classList.remove(&#x27;hidden&#x27;);
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() =&gt; {
+        toast.classList.add(&#x27;hidden&#x27;);
+      }, 4500);
+    }
+
+    // --- 2. 初始化與事件綁定 ---
+    window.onload = function () {
+      setupDragAndDrop();
+      loadDefaultFallCase();
+      window.addEventListener(&#x27;resize&#x27;, () =&gt; {
+        recalculateAndRender();
+      });
+    };
+
+    function loadDefaultFallCase() {
+      currentData = JSON.parse(JSON.stringify(defaultFallData));
+      document.getElementById(&#x27;chartTypeSelect&#x27;).value = &#x27;u&#x27;;
+      chartType = &#x27;u&#x27;;
+      document.getElementById(&#x27;baselineLockCheck&#x27;).checked = false;
+      document.getElementById(&#x27;customClCheck&#x27;).checked = false;
+      document.getElementById(&#x27;customClValue&#x27;).value = &#x27;&#x27;;
+      toggleCustomCl();
+      toggleBaselineLock();
+      updateChartTypeUI();
+      renderDataTable();
+      recalculateAndRender();
+      hideAlert();
+    }
+
+    function handleChartTypeChange() {
+      const prevType = chartType;
+      chartType = document.getElementById(&#x27;chartTypeSelect&#x27;).value;
+
+      if (chartType === &#x27;g&#x27;) {
+        const hasValidFullDates = currentData.length &gt;= 3 &amp;&amp; currentData.every(d =&gt; !isNaN(parseDateString(d.month)));
+        if (!hasValidFullDates) {
+          currentData = JSON.parse(JSON.stringify(defaultRareEventData));
+          showToastMessage(&quot;已自動載入「罕見事件發生日期」示範資料，您可直接修改或匯入 CSV/Excel 日期！&quot;);
+        }
+        recalculateRareEventIntervals();
+      } else if (prevType === &#x27;g&#x27;) {
+        const isDefaultRare = currentData.length === defaultRareEventData.length &amp;&amp; currentData[0]?.month === &#x27;2025/01/05&#x27;;
+        if (isDefaultRare) {
+          currentData = JSON.parse(JSON.stringify(defaultFallData));
+        }
+      }
+
+      updateChartTypeUI();
+      renderDataTable();
+      recalculateAndRender();
+    }
+
+    // 解析日期字串為 UTC 毫秒時間戳
+    function parseDateString(dateStr) {
+      if (!dateStr) return NaN;
+      const cleaned = String(dateStr).trim().replace(/[-.]/g, &#x27;/&#x27;);
+      const parts = cleaned.split(&#x27;/&#x27;);
+      if (parts.length !== 3) return NaN;
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10);
+      const d = parseInt(parts[2], 10);
+      if (isNaN(y) || isNaN(m) || isNaN(d) || m &lt; 1 || m &gt; 12 || d &lt; 1 || d &gt; 31) return NaN;
+      const utc = Date.UTC(y, m - 1, d);
+      const checkDate = new Date(utc);
+      if (checkDate.getUTCFullYear() !== y || checkDate.getUTCMonth() !== m - 1 || checkDate.getUTCDate() !== d) {
+        return NaN;
+      }
+      return utc;
+    }
+
+    // 依據事件發生日期自動換算相鄰事件間隔天數
+    function recalculateRareEventIntervals() {
+      if (chartType !== &#x27;g&#x27;) return;
+      for (let i = 0; i &lt; currentData.length; i++) {
+        if (i === 0) {
+          currentData[i].num = 0;
+        } else {
+          const prevTs = parseDateString(currentData[i - 1].month);
+          const currTs = parseDateString(currentData[i].month);
+          if (!isNaN(prevTs) &amp;&amp; !isNaN(currTs)) {
+            const diffDays = Math.round((currTs - prevTs) / (1000 * 60 * 60 * 24));
+            currentData[i].num = diffDays;
+          } else {
+            currentData[i].num = NaN;
+          }
+        }
+      }
+    }
+
+    function updateChartTypeUI() {
+      const descEl = document.getElementById(&#x27;chartTypeDesc&#x27;);
+      const numHeader = document.getElementById(&#x27;colNumHeader&#x27;);
+      const denHeader = document.getElementById(&#x27;colDenHeader&#x27;);
+      const formatHint = document.getElementById(&#x27;excelFormatHint&#x27;);
+
+      const descriptions = {
+        &#x27;u&#x27;: &#x27;&lt;strong&gt;u 圖適用&lt;/strong&gt;：分母（如住院人日、導尿管人日）每月變動之事件密度指標，UCL/LCL 呈階梯狀。&#x27;,
+        &#x27;p&#x27;: &#x27;&lt;strong&gt;p 圖適用&lt;/strong&gt;：不良率。調劑疏失率、再入院率、手術部位標記不全率等二項分佈指標。&#x27;,
+        &#x27;c&#x27;: &#x27;&lt;strong&gt;c 圖適用&lt;/strong&gt;：缺點數（固定檢驗單位）。如每月全院針扎總件數、每月環境表面採檢菌落數。&#x27;,
+        &#x27;np&#x27;: &#x27;&lt;strong&gt;np 圖適用&lt;/strong&gt;：不良件數（固定抽樣數）。如每月固定抽審 100 份病歷之不合格份數。&#x27;,
+        &#x27;g&#x27;: &#x27;&lt;strong&gt;g 圖適用&lt;/strong&gt;：罕見事件（Rare Events，幾何分佈）。輸入每次「事件發生日期」，系統自動計算相鄰事件間隔天數（CL = ln(2) × 平均間隔天數）。&#x27;,
+        &#x27;imr&#x27;: &#x27;&lt;strong&gt;I-MR 圖適用&lt;/strong&gt;：計量值個別觀測（n=1）。如每月急診平均滯留時間（小時）、平均住院日。&#x27;,
+        &#x27;xbar-r&#x27;: &#x27;&lt;strong&gt;Xbar-R 圖適用&lt;/strong&gt;：計量值子群抽樣。每期抽樣多個數據，匯入格式為「週別 | 第1次 | 第2次 ... 第N次」。&#x27;
+      };
+      descEl.innerHTML = descriptions[chartType] || &#x27;&#x27;;
+
+      if (chartType === &#x27;u&#x27;) {
+        numHeader.textContent = &#x27;分子 (件數)&#x27;;
+        denHeader.textContent = &#x27;分母 (人日數)&#x27;;
+        if (formatHint) formatHint.textContent = &#x27;欄位順序：時間 | 分子(件數) | 分母(人日數)&#x27;;
+      } else if (chartType === &#x27;p&#x27; || chartType === &#x27;np&#x27;) {
+        numHeader.textContent = &#x27;分子 (不良數)&#x27;;
+        denHeader.textContent = &#x27;分母 (總檢驗數)&#x27;;
+        if (formatHint) formatHint.textContent = &#x27;欄位順序：時間 | 分子(不良數) | 分母(總檢驗數)&#x27;;
+      } else if (chartType === &#x27;g&#x27;) {
+        numHeader.textContent = &#x27;間隔天數 (自動)&#x27;;
+        denHeader.textContent = &#x27;— (無需分母)&#x27;;
+        if (formatHint) formatHint.textContent = &#x27;欄位順序：事件序號/說明 | 發生日期 (YYYY/MM/DD)&#x27;;
+      } else if (chartType === &#x27;c&#x27; || chartType === &#x27;imr&#x27;) {
+        numHeader.textContent = chartType === &#x27;c&#x27; ? &#x27;缺點數 (c)&#x27; : &#x27;觀測值 (I)&#x27;;
+        denHeader.textContent = &#x27;— (無需分母)&#x27;;
+        if (formatHint) formatHint.textContent = `欄位順序：時間 | ${chartType === &#x27;c&#x27; ? &#x27;缺點數(c)&#x27; : &#x27;觀測值(I)&#x27;} (僅2欄)`;
+      } else if (chartType === &#x27;xbar-r&#x27;) {
+        numHeader.textContent = &#x27;子群平均 (X̄)&#x27;;
+        denHeader.textContent = &#x27;子群全距 (R)&#x27;;
+        if (formatHint) formatHint.textContent = &#x27;欄位順序：時間 | 第1次 | 第2次 ... 第N次 (自動算X̄與R)&#x27;;
+      }
+
+      updateCustomClHint();
+    }
+
+    function updateCustomClHint() {
+      const hintEl = document.getElementById(&#x27;customClUnitHint&#x27;);
+      if (!hintEl) return;
+      const hints = {
+        &#x27;u&#x27;: &#x27;(原始比率，如 0.0007)&#x27;,
+        &#x27;p&#x27;: &#x27;(小數比率，如 0.05 代表 5%)&#x27;,
+        &#x27;c&#x27;: &#x27;(平均缺點數，如 3.5)&#x27;,
+        &#x27;np&#x27;: &#x27;(平均不良件數，如 4.2)&#x27;,
+        &#x27;g&#x27;: &#x27;(中心線 CL 天數，如 31.2)&#x27;,
+        &#x27;imr&#x27;: &#x27;(目標平均值，如 14.5)&#x27;,
+        &#x27;xbar-r&#x27;: &#x27;(目標總平均 X̿，如 15.0)&#x27;
+      };
+      hintEl.textContent = hints[chartType] || &#x27;&#x27;;
+    }
+
+    function toggleCustomCl() {
+      const isChecked = document.getElementById(&#x27;customClCheck&#x27;).checked;
+      const inputGroup = document.getElementById(&#x27;customClInputGroup&#x27;);
+      const customInput = document.getElementById(&#x27;customClValue&#x27;);
+
+      if (isChecked) {
+        inputGroup.classList.remove(&#x27;disabled-group&#x27;);
+        if (document.getElementById(&#x27;baselineLockCheck&#x27;).checked) {
+          document.getElementById(&#x27;baselineLockCheck&#x27;).checked = false;
+          document.getElementById(&#x27;baselineInputGroup&#x27;).classList.add(&#x27;disabled-group&#x27;);
+        }
+        if (customInput.value === &#x27;&#x27; &amp;&amp; currentData.length &gt; 0) {
+          let defaultVal = 0;
+          if (chartType === &#x27;u&#x27; || chartType === &#x27;p&#x27;) {
+            const sNum = currentData.reduce((a, b) =&gt; a + b.num, 0);
+            const sDen = currentData.reduce((a, b) =&gt; a + b.den, 0);
+            defaultVal = sDen &gt; 0 ? Number((sNum / sDen).toFixed(6)) : 0;
+          } else if (chartType === &#x27;g&#x27;) {
+            const validIntervals = currentData.slice(1).map(d =&gt; d.num).filter(v =&gt; !isNaN(v) &amp;&amp; v &gt;= 0);
+            const sNum = validIntervals.reduce((a, b) =&gt; a + b, 0);
+            const avgG = validIntervals.length &gt; 0 ? (sNum / validIntervals.length) : 30;
+            defaultVal = Number((Math.LN2 * avgG).toFixed(2));
+          } else {
+            const sNum = currentData.reduce((a, b) =&gt; a + b.num, 0);
+            defaultVal = Number((sNum / currentData.length).toFixed(4));
+          }
+          customInput.value = defaultVal;
+        }
+      } else {
+        inputGroup.classList.add(&#x27;disabled-group&#x27;);
+      }
+      recalculateAndRender();
+    }
+
+    function toggleBaselineLock() {
+      const isChecked = document.getElementById(&#x27;baselineLockCheck&#x27;).checked;
+      const inputGroup = document.getElementById(&#x27;baselineInputGroup&#x27;);
+      if (isChecked) {
+        inputGroup.classList.remove(&#x27;disabled-group&#x27;);
+        if (document.getElementById(&#x27;customClCheck&#x27;).checked) {
+          document.getElementById(&#x27;customClCheck&#x27;).checked = false;
+          document.getElementById(&#x27;customClInputGroup&#x27;).classList.add(&#x27;disabled-group&#x27;);
+        }
+      } else {
+        inputGroup.classList.add(&#x27;disabled-group&#x27;);
+      }
+      recalculateAndRender();
+    }
+
+    function toggleAllRules(state) {
+      for (let i = 1; i &lt;= 8; i++) {
+        document.getElementById(`rule${i}`).checked = state;
+      }
+      recalculateAndRender();
+    }
+
+    function showAlert(msg) {
+      document.getElementById(&#x27;alertMessage&#x27;).textContent = msg;
+      document.getElementById(&#x27;alertBanner&#x27;).classList.remove(&#x27;hidden&#x27;);
+    }
+
+    function hideAlert() {
+      document.getElementById(&#x27;alertBanner&#x27;).classList.add(&#x27;hidden&#x27;);
+    }
+
+    // --- 3. 線上可編輯表格 (Editable Grid) ---
+    function renderDataTable() {
+      const tbody = document.getElementById(&#x27;dataTableBody&#x27;);
+      tbody.innerHTML = &#x27;&#x27;;
+
+      const isSingleColMode = (chartType === &#x27;c&#x27; || chartType === &#x27;imr&#x27; || chartType === &#x27;g&#x27;);
+      const isGChart = (chartType === &#x27;g&#x27;);
+
+      currentData.forEach((row, index) =&gt; {
+        const tr = document.createElement(&#x27;tr&#x27;);
+
+        const numDisplayVal = isGChart
+          ? (index === 0 ? &#x27;起始基準日&#x27; : (isNaN(row.num) ? &#x27;日期格式錯誤&#x27; : `${row.num} 天`))
+          : row.num;
+
+        const numStyle = index === 0
+          ? &#x27;color:#94a3b8;font-style:italic;&#x27;
+          : (row.num &lt; 0 || isNaN(row.num) ? &#x27;color:#dc2626;font-weight:700;&#x27; : &#x27;color:#1d4ed8;font-weight:600;&#x27;);
+
+        tr.innerHTML = `
+          &lt;td class=&quot;text-center font-mono&quot; style=&quot;color:#94a3b8;&quot;&gt;${index + 1}&lt;/td&gt;
+          &lt;td&gt;
+            &lt;input type=&quot;text&quot; value=&quot;${row.month}&quot; placeholder=&quot;${isGChart ? &#x27;YYYY/MM/DD&#x27; : &#x27;期別&#x27;}&quot; onchange=&quot;updateCell(${index}, &#x27;month&#x27;, this.value)&quot;
+              class=&quot;cell-input&quot; style=&quot;font-weight:500;&quot;&gt;
+          &lt;/td&gt;
+          &lt;td&gt;
+            ${isGChart
+              ? `&lt;div class=&quot;text-right font-mono&quot; style=&quot;padding:0.25rem 0.375rem;${numStyle}&quot;&gt;${numDisplayVal}&lt;/div&gt;`
+              : `&lt;input type=&quot;number&quot; step=&quot;any&quot; value=&quot;${row.num}&quot; onchange=&quot;updateCell(${index}, &#x27;num&#x27;, this.value)&quot;
+                  class=&quot;cell-input text-right font-mono&quot;&gt;`
+            }
+          &lt;/td&gt;
+          &lt;td&gt;
+            &lt;input type=&quot;number&quot; step=&quot;any&quot; value=&quot;${row.den}&quot; ${isSingleColMode ? &#x27;disabled&#x27; : &#x27;&#x27;} onchange=&quot;updateCell(${index}, &#x27;den&#x27;, this.value)&quot;
+              class=&quot;cell-input text-right font-mono&quot;&gt;
+          &lt;/td&gt;
+          &lt;td class=&quot;text-center&quot;&gt;
+            &lt;button onclick=&quot;deleteRow(${index})&quot; title=&quot;刪除此列&quot; style=&quot;background:none;border:none;color:#94a3b8;cursor:pointer;padding:0.25rem;&quot;&gt;
+              &lt;svg width=&quot;15&quot; height=&quot;15&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; viewBox=&quot;0 0 24 24&quot;&gt;
+                &lt;path stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; d=&quot;M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16&quot;&gt;&lt;/path&gt;
+              &lt;/svg&gt;
+            &lt;/button&gt;
+          &lt;/td&gt;
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateCell(index, field, value) {
+      if (field === &#x27;month&#x27;) {
+        currentData[index].month = value.trim() || `期別 ${index + 1}`;
+        if (chartType === &#x27;g&#x27;) {
+          recalculateRareEventIntervals();
+          renderDataTable();
+        }
+      } else {
+        const parsed = parseFloat(value);
+        currentData[index][field] = isNaN(parsed) ? 0 : parsed;
+      }
+      recalculateAndRender();
+    }
+
+    function addRow() {
+      const nextNum = currentData.length + 1;
+      if (chartType === &#x27;g&#x27;) {
+        let nextDateStr = &#x27;2026/06/15&#x27;;
+        if (currentData.length &gt; 0) {
+          const lastTs = parseDateString(currentData[currentData.length - 1].month);
+          if (!isNaN(lastTs)) {
+            const d = new Date(lastTs + 30 * 24 * 60 * 60 * 1000);
+            nextDateStr = `${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2, &#x27;0&#x27;)}/${String(d.getUTCDate()).padStart(2, &#x27;0&#x27;)}`;
+          }
+        }
+        currentData.push({ month: nextDateStr, num: 30, den: 1 });
+        recalculateRareEventIntervals();
+      } else {
+        const defaultDen = currentData.length &gt; 0 ? currentData[currentData.length - 1].den : 8000;
+        currentData.push({ month: `新增期別 ${nextNum}`, num: 5, den: defaultDen });
+      }
+      renderDataTable();
+      recalculateAndRender();
+    }
+
+    function deleteRow(index) {
+      currentData.splice(index, 1);
+      if (chartType === &#x27;g&#x27;) {
+        recalculateRareEventIntervals();
+      }
+      renderDataTable();
+      recalculateAndRender();
+    }
+
+    function clearTable() {
+      currentData = [];
+      renderDataTable();
+      recalculateAndRender();
+    }
+
+    // --- 4. 統計流程管制 (SPC) 核心數學引擎 ---
+    function computeSPCStatistics() {
+      hideAlert();
+      const n = currentData.length;
+      if (n &lt; 2) {
+        return { error: &quot;數據筆數不足！請至少輸入 2 筆以上的連續期別數據以繪製管制圖。&quot; };
+      }
+
+      if (chartType === &#x27;g&#x27;) {
+        if (n &lt; 3) {
+          return { error: &quot;g 圖至少需要 3 筆事件發生日期（才能產生 2 筆以上的相鄰事件間隔天數）！&quot; };
+        }
+        recalculateRareEventIntervals();
+        for (let i = 0; i &lt; n; i++) {
+          if (isNaN(parseDateString(currentData[i].month))) {
+            return { error: `第 ${i + 1} 筆日期格式不正確（請使用 YYYY/MM/DD 格式，例如 2025/05/10）！` };
+          }
+          if (i &gt; 0 &amp;&amp; currentData[i].num &lt; 0) {
+            return { error: `第 ${i + 1} 筆發生日期 (${currentData[i].month}) 早於前一筆 (${currentData[i - 1].month})，請依時間先後順序排列！` };
+          }
+        }
+      }
+
+      const isBaselineLocked = document.getElementById(&#x27;baselineLockCheck&#x27;).checked;
+      const isCustomCl = document.getElementById(&#x27;customClCheck&#x27;).checked;
+      let customClVal = null;
+
+      if (isCustomCl) {
+        customClVal = parseFloat(document.getElementById(&#x27;customClValue&#x27;).value);
+        if (isNaN(customClVal) || customClVal &lt; 0) {
+          return { error: &quot;請輸入有效的自訂穩定平均值（需為大於或等於 0 的數值）！&quot; };
+        }
+        if (chartType === &#x27;p&#x27; &amp;&amp; customClVal &gt; 1) {
+          return { error: &quot;p 圖的自訂穩定平均值（不良率）需介於 0 與 1 之間（例如 0.05 代表 5%）！&quot; };
+        }
+      }
+
+      const effectiveN = (chartType === &#x27;g&#x27;) ? (n - 1) : n;
+      let baseLength = effectiveN;
+      if (isBaselineLocked) {
+        const inputBase = parseInt(document.getElementById(&#x27;baselineCount&#x27;).value, 10);
+        if (isNaN(inputBase) || inputBase &lt; 2) {
+          return { error: &quot;改善前期筆數至少需要 2 筆數據！&quot; };
+        }
+        baseLength = Math.min(inputBase, effectiveN);
+      }
+
+      const hasTwoPhases = isBaselineLocked &amp;&amp; baseLength &lt; effectiveN;
+
+      const x = [];
+      const cl = [];
+      const ucl = [];
+      const lcl = [];
+      const sigma = [];
+      const labels = (chartType === &#x27;g&#x27;)
+        ? currentData.slice(1).map(d =&gt; `${d.month}`)
+        : currentData.map(d =&gt; d.month);
+
+      const rVals = [];
+      const rCl = [];
+      const rUcl = [];
+      const rLcl = [];
+      const rSigma = [];
+
+      function calculateSegmentLimits(start, end) {
+        const segLen = end - start;
+        if (segLen &lt;= 0) return;
+
+        if (chartType === &#x27;u&#x27;) {
+          let sumNum = 0, sumDen = 0;
+          for (let i = start; i &lt; end; i++) {
+            if (currentData[i].den &lt;= 0) {
+              throw new Error(`第 ${i + 1} 筆數據 (${currentData[i].month}) 的分母必須大於 0！`);
+            }
+            sumNum += currentData[i].num;
+            sumDen += currentData[i].den;
+          }
+          const uBar = (isCustomCl &amp;&amp; customClVal !== null) ? customClVal : (sumNum / sumDen);
+
+          for (let i = start; i &lt; end; i++) {
+            const ni = currentData[i].den;
+            const ui = currentData[i].num / ni;
+            const s = Math.sqrt(uBar / ni);
+            x[i] = ui;
+            cl[i] = uBar;
+            sigma[i] = s;
+            ucl[i] = uBar + 3 * s;
+            lcl[i] = Math.max(0, uBar - 3 * s);
+          }
+        } else if (chartType === &#x27;p&#x27;) {
+          let sumNum = 0, sumDen = 0;
+          for (let i = start; i &lt; end; i++) {
+            if (currentData[i].den &lt;= 0) {
+              throw new Error(`第 ${i + 1} 筆數據 (${currentData[i].month}) 的分母必須大於 0！`);
+            }
+            if (currentData[i].num &gt; currentData[i].den) {
+              throw new Error(`p 圖異常：第 ${i + 1} 筆分子 (${currentData[i].num}) 不可大於分母 (${currentData[i].den})！`);
+            }
+            sumNum += currentData[i].num;
+            sumDen += currentData[i].den;
+          }
+          const pBar = (isCustomCl &amp;&amp; customClVal !== null) ? customClVal : (sumNum / sumDen);
+
+          for (let i = start; i &lt; end; i++) {
+            const ni = currentData[i].den;
+            const pi = currentData[i].num / ni;
+            const s = Math.sqrt((pBar * (1 - pBar)) / ni);
+            x[i] = pi;
+            cl[i] = pBar;
+            sigma[i] = s;
+            ucl[i] = Math.min(1, pBar + 3 * s);
+            lcl[i] = Math.max(0, pBar - 3 * s);
+          }
+        } else if (chartType === &#x27;c&#x27;) {
+          let sumC = 0;
+          for (let i = start; i &lt; end; i++) sumC += currentData[i].num;
+          const cBar = (isCustomCl &amp;&amp; customClVal !== null) ? customClVal : (sumC / segLen);
+          const s = Math.sqrt(cBar);
+
+          for (let i = start; i &lt; end; i++) {
+            x[i] = currentData[i].num;
+            cl[i] = cBar;
+            sigma[i] = s;
+            ucl[i] = cBar + 3 * s;
+            lcl[i] = Math.max(0, cBar - 3 * s);
+          }
+        } else if (chartType === &#x27;np&#x27;) {
+          const fixedN = currentData[start].den;
+          if (fixedN &lt;= 0) {
+            throw new Error(`第 ${start + 1} 筆樣本數必須大於 0！`);
+          }
+          let sumNp = 0;
+          for (let i = start; i &lt; end; i++) {
+            if (currentData[i].den !== fixedN) {
+              showAlert(`提醒：np 圖要求各期樣本數固定，目前第 ${i + 1} 筆樣本數 (${currentData[i].den}) 與基準樣本數 (${fixedN}) 不同，建議改用 p 圖。`);
+            }
+            sumNp += currentData[i].num;
+          }
+          const npBar = (isCustomCl &amp;&amp; customClVal !== null) ? customClVal : (sumNp / segLen);
+          const pBar = npBar / fixedN;
+          if (pBar &lt; 0 || pBar &gt; 1) {
+            throw new Error(`np 圖自訂中心線不可大於固定樣本數 (${fixedN})！`);
+          }
+          const s = Math.sqrt(npBar * (1 - pBar));
+          for (let i = start; i &lt; end; i++) {
+            x[i] = currentData[i].num;
+            cl[i] = npBar;
+            sigma[i] = s;
+            ucl[i] = npBar + 3 * s;
+            lcl[i] = Math.max(0, npBar - 3 * s);
+          }
+        } else if (chartType === &#x27;g&#x27;) {
+          let sumG = 0;
+          for (let i = start; i &lt; end; i++) {
+            sumG += currentData[i + 1].num;
+          }
+          const avgG = sumG / segLen;
+          const clVal = (isCustomCl &amp;&amp; customClVal !== null) ? customClVal : (Math.LN2 * avgG);
+          const gBar = (isCustomCl &amp;&amp; customClVal !== null) ? (customClVal / Math.LN2) : avgG;
+          const s = Math.sqrt(gBar * (gBar + 1));
+          const uclVal = gBar + 3 * s;
+          const lclVal = Math.max(0, gBar - 3 * s);
+
+          for (let i = start; i &lt; end; i++) {
+            x[i] = currentData[i + 1].num;
+            cl[i] = clVal;
+            sigma[i] = s;
+            ucl[i] = uclVal;
+            lcl[i] = lclVal;
+          }
+        } else if (chartType === &#x27;imr&#x27;) {
+          let sumI = 0;
+          for (let i = start; i &lt; end; i++) sumI += currentData[i].num;
+          const xBar = (isCustomCl &amp;&amp; customClVal !== null) ? customClVal : (sumI / segLen);
+
+          let sumMR = 0, mrCount = 0;
+          for (let i = start; i &lt; end; i++) {
+            if (i === start) {
+              rVals[i] = null;
+            } else {
+              const mr = Math.abs(currentData[i].num - currentData[i - 1].num);
+              rVals[i] = mr;
+              sumMR += mr;
+              mrCount++;
+            }
+          }
+          const mrBar = mrCount &gt; 0 ? sumMR / mrCount : 0;
+          const s = mrBar / 1.128;
+          const rUclVal = 3.267 * mrBar;
+          const rLclVal = 0;
+          const rSigVal = mrBar &gt; 0 ? (rUclVal - mrBar) / 3 : 0;
+
+          for (let i = start; i &lt; end; i++) {
+            x[i] = currentData[i].num;
+            cl[i] = xBar;
+            sigma[i] = s;
+            ucl[i] = xBar + 3 * s;
+            lcl[i] = xBar - 3 * s;
+
+            rCl[i] = mrBar;
+            rUcl[i] = rUclVal;
+            rLcl[i] = rLclVal;
+            rSigma[i] = rSigVal;
+          }
+        } else if (chartType === &#x27;xbar-r&#x27;) {
+          let sumX = 0, sumR = 0;
+          for (let i = start; i &lt; end; i++) {
+            sumX += currentData[i].num;
+            sumR += currentData[i].den;
+          }
+          const xDoubleBar = (isCustomCl &amp;&amp; customClVal !== null) ? customClVal : (sumX / segLen);
+          const rBar = sumR / segLen;
+
+          const subN = currentData[start].subgroupSize || 5;
+          const consts = SPC_CONSTANTS[subN] || { A2: 0.577, D3: 0, D4: 2.114 };
+          const s = (consts.A2 * rBar) / 3;
+          const rUclVal = consts.D4 * rBar;
+          const rLclVal = consts.D3 * rBar;
+          const rSigVal = rBar &gt; 0 ? (rUclVal - rBar) / 3 : 0;
+
+          for (let i = start; i &lt; end; i++) {
+            x[i] = currentData[i].num;
+            cl[i] = xDoubleBar;
+            sigma[i] = s;
+            ucl[i] = xDoubleBar + 3 * s;
+            lcl[i] = xDoubleBar - 3 * s;
+
+            rVals[i] = currentData[i].den;
+            rCl[i] = rBar;
+            rUcl[i] = rUclVal;
+            rLcl[i] = rLclVal;
+            rSigma[i] = rSigVal;
+          }
+        }
+      }
+
+      try {
+        if (hasTwoPhases) {
+          calculateSegmentLimits(0, baseLength);
+          calculateSegmentLimits(baseLength, effectiveN);
+        } else {
+          calculateSegmentLimits(0, effectiveN);
+        }
+      } catch (err) {
+        return { error: err.message };
+      }
+
+      const zScores = [];
+      for (let i = 0; i &lt; effectiveN; i++) {
+        if (sigma[i] &amp;&amp; sigma[i] &gt; 0) {
+          zScores.push((x[i] - cl[i]) / sigma[i]);
+        } else {
+          zScores.push(0);
+        }
+      }
+
+      const rZScores = [];
+      if (chartType === &#x27;imr&#x27; || chartType === &#x27;xbar-r&#x27;) {
+        for (let i = 0; i &lt; effectiveN; i++) {
+          if (rVals[i] !== null &amp;&amp; rSigma[i] &amp;&amp; rSigma[i] &gt; 0) {
+            rZScores.push((rVals[i] - rCl[i]) / rSigma[i]);
+          } else {
+            rZScores.push(null);
+          }
+        }
+      }
+
+      return { labels, x, cl, ucl, lcl, sigma, zScores, baseLength, hasTwoPhases, rVals, rCl, rUcl, rLcl, rSigma, rZScores };
+    }
+
+    // --- 5. 完整 Nelson Rules 8 大變異警報引擎 ---
+    function evaluateNelsonRules(stats) {
+      const { x, ucl, lcl, zScores, baseLength, hasTwoPhases } = stats;
+      const n = x.length;
+      const activeRules = {};
+      for (let r = 1; r &lt;= 8; r++) {
+        activeRules[r] = document.getElementById(`rule${r}`).checked;
+      }
+
+      const violations = Array.from({ length: n }, () =&gt; []);
+
+      function addViolation(idx, ruleNum) {
+        if (!violations[idx].includes(ruleNum)) {
+          violations[idx].push(ruleNum);
+        }
+      }
+
+      function evaluateSegment(start, end) {
+        for (let i = start; i &lt; end; i++) {
+          const z = zScores[i];
+
+          // Rule 1
+          if (activeRules[1]) {
+            if (x[i] &gt; ucl[i] || x[i] &lt; lcl[i] || Math.abs(z) &gt; 3) {
+              addViolation(i, 1);
+            }
+          }
+
+          // Rule 2
+          if (activeRules[2] &amp;&amp; (i - start) &gt;= 8) {
+            let allAbove = true;
+            let allBelow = true;
+            for (let k = i - 8; k &lt;= i; k++) {
+              if (zScores[k] &lt;= 0) allAbove = false;
+              if (zScores[k] &gt;= 0) allBelow = false;
+            }
+            if (allAbove || allBelow) {
+              for (let k = i - 8; k &lt;= i; k++) addViolation(k, 2);
+            }
+          }
+
+          // Rule 3
+          if (activeRules[3] &amp;&amp; (i - start) &gt;= 5) {
+            let strictlyInc = true;
+            let strictlyDec = true;
+            for (let k = i - 4; k &lt;= i; k++) {
+              if (x[k] &lt;= x[k - 1]) strictlyInc = false;
+              if (x[k] &gt;= x[k - 1]) strictlyDec = false;
+            }
+            if (strictlyInc || strictlyDec) {
+              for (let k = i - 5; k &lt;= i; k++) addViolation(k, 3);
+            }
+          }
+
+          // Rule 4
+          if (activeRules[4] &amp;&amp; (i - start) &gt;= 13) {
+            let alternating = true;
+            for (let k = i - 12; k &lt;= i; k++) {
+              const diff1 = x[k - 1] - x[k - 2];
+              const diff2 = x[k] - x[k - 1];
+              if (diff1 * diff2 &gt;= 0) {
+                alternating = false;
+                break;
+              }
+            }
+            if (alternating) {
+              for (let k = i - 13; k &lt;= i; k++) addViolation(k, 4);
+            }
+          }
+
+          // Rule 5
+          if (activeRules[5] &amp;&amp; (i - start) &gt;= 2) {
+            const windowZ = [zScores[i - 2], zScores[i - 1], zScores[i]];
+            const upperA = windowZ.filter(v =&gt; v &gt; 2).length;
+            const lowerA = windowZ.filter(v =&gt; v &lt; -2).length;
+            if (upperA &gt;= 2) {
+              for (let k = i - 2; k &lt;= i; k++) if (zScores[k] &gt; 2) addViolation(k, 5);
+            }
+            if (lowerA &gt;= 2) {
+              for (let k = i - 2; k &lt;= i; k++) if (zScores[k] &lt; -2) addViolation(k, 5);
+            }
+          }
+
+          // Rule 6
+          if (activeRules[6] &amp;&amp; (i - start) &gt;= 4) {
+            const windowZ = zScores.slice(i - 4, i + 1);
+            const upperB = windowZ.filter(v =&gt; v &gt; 1).length;
+            const lowerB = windowZ.filter(v =&gt; v &lt; -1).length;
+            if (upperB &gt;= 4) {
+              for (let k = i - 4; k &lt;= i; k++) if (zScores[k] &gt; 1) addViolation(k, 6);
+            }
+            if (lowerB &gt;= 4) {
+              for (let k = i - 4; k &lt;= i; k++) if (zScores[k] &lt; -1) addViolation(k, 6);
+            }
+          }
+
+          // Rule 7
+          if (activeRules[7] &amp;&amp; (i - start) &gt;= 14) {
+            let allInZoneC = true;
+            for (let k = i - 14; k &lt;= i; k++) {
+              if (Math.abs(zScores[k]) &gt; 1) {
+                allInZoneC = false;
+                break;
+              }
+            }
+            if (allInZoneC) {
+              for (let k = i - 14; k &lt;= i; k++) addViolation(k, 7);
+            }
+          }
+
+          // Rule 8：連續 8 點落在中心線兩側，且沒有任何一點落在 Zone C (1σ) 內
+          if (activeRules[8] &amp;&amp; (i - start) &gt;= 7) {
+            let allOutsideZoneC = true;
+            let hasAbove = false;
+            let hasBelow = false;
+            for (let k = i - 7; k &lt;= i; k++) {
+              if (Math.abs(zScores[k]) &lt;= 1) {
+                allOutsideZoneC = false;
+                break;
+              }
+              if (zScores[k] &gt; 1) hasAbove = true;
+              if (zScores[k] &lt; -1) hasBelow = true;
+            }
+            if (allOutsideZoneC &amp;&amp; hasAbove &amp;&amp; hasBelow) {
+              for (let k = i - 7; k &lt;= i; k++) addViolation(k, 8);
+            }
+          }
+        }
+      }
+
+      if (hasTwoPhases) {
+        evaluateSegment(0, baseLength);
+        evaluateSegment(baseLength, n);
+      } else {
+        evaluateSegment(0, n);
+      }
+
+      return violations;
+    }
+
+    // --- 6. 自研零依賴高解析度 SVG 向量管制圖繪圖引擎 ---
+    function renderOfflineSPCChart(options) {
+      const {
+        containerId,
+        title,
+        labels,
+        values,
+        cl,
+        ucl,
+        lcl,
+        zScores,
+        violations,
+        baseLength,
+        hasTwoPhases,
+        isStepLimit,
+        height,
+        valueFormatter,
+        isSecondary
+      } = options;
+
+      const container = document.getElementById(containerId);
+      container.innerHTML = &#x27;&#x27;;
+
+      const width = Math.max(container.clientWidth || 760, 520);
+      const pad = { top: 44, right: 28, bottom: 72, left: 68 };
+      const plotW = width - pad.left - pad.right;
+      const plotH = height - pad.top - pad.bottom;
+
+      // 計算 Y 軸上下範圍
+      let allY = [];
+      for (let i = 0; i &lt; values.length; i++) {
+        if (values[i] !== null &amp;&amp; values[i] !== undefined &amp;&amp; !isNaN(values[i])) allY.push(values[i]);
+        if (ucl[i] !== null &amp;&amp; ucl[i] !== undefined &amp;&amp; !isNaN(ucl[i])) allY.push(ucl[i]);
+        if (lcl[i] !== null &amp;&amp; lcl[i] !== undefined &amp;&amp; !isNaN(lcl[i])) allY.push(lcl[i]);
+        if (cl[i] !== null &amp;&amp; cl[i] !== undefined &amp;&amp; !isNaN(cl[i])) allY.push(cl[i]);
+      }
+      if (allY.length === 0) allY = [0, 1];
+
+      let minY = Math.min(...allY);
+      let maxY = Math.max(...allY);
+      if (minY === maxY) {
+        minY = Math.max(0, minY - 1);
+        maxY = maxY + 1;
+      }
+      const spanY = maxY - minY;
+      minY = Math.max(0, minY - spanY * 0.08);
+      maxY = maxY + spanY * 0.12;
+
+      const n = labels.length;
+      const getX = (idx) =&gt; {
+        if (n === 1) return pad.left + plotW / 2;
+        const step = plotW / n;
+        return pad.left + step * (idx + 0.5);
+      };
+      const getY = (val) =&gt; {
+        return pad.top + plotH - ((val - minY) / (maxY - minY)) * plotH;
+      };
+
+      const svgNS = &quot;http://www.w3.org/2000/svg&quot;;
+      const svg = document.createElementNS(svgNS, &quot;svg&quot;);
+      svg.setAttribute(&quot;xmlns&quot;, svgNS);
+      svg.setAttribute(&quot;viewBox&quot;, `0 0 ${width} ${height}`);
+      svg.setAttribute(&quot;width&quot;, &quot;100%&quot;);
+      svg.setAttribute(&quot;height&quot;, height);
+      svg.style.background = &quot;#ffffff&quot;;
+      svg.style.display = &quot;block&quot;;
+
+      function createEl(tag, attrs = {}) {
+        const el = document.createElementNS(svgNS, tag);
+        for (const [k, v] of Object.entries(attrs)) {
+          el.setAttribute(k, v);
+        }
+        return el;
+      }
+
+      // 1. 背景與圖表主標題
+      svg.appendChild(createEl(&quot;rect&quot;, { x: 0, y: 0, width, height, fill: &quot;#ffffff&quot; }));
+      const titleEl = createEl(&quot;text&quot;, {
+        x: width / 2, y: 24,
+        &quot;text-anchor&quot;: &quot;middle&quot;,
+        &quot;font-size&quot;: isSecondary ? &quot;14&quot; : &quot;15&quot;,
+        &quot;font-weight&quot;: &quot;700&quot;,
+        fill: &quot;#1e293b&quot;,
+        &quot;font-family&quot;: &quot;sans-serif&quot;
+      });
+      titleEl.textContent = title;
+      svg.appendChild(titleEl);
+
+      // 2. 水平網格線與 Y 軸刻度
+      const tickCount = 5;
+      for (let t = 0; t &lt;= tickCount; t++) {
+        const val = minY + ((maxY - minY) * t) / tickCount;
+        const yPos = getY(val);
+
+        svg.appendChild(createEl(&quot;line&quot;, {
+          x1: pad.left, y1: yPos, x2: width - pad.right, y2: yPos,
+          stroke: t === 0 ? &quot;#cbd5e1&quot; : &quot;#f1f5f9&quot;,
+          &quot;stroke-width&quot;: &quot;1&quot;
+        }));
+
+        const labelText = createEl(&quot;text&quot;, {
+          x: pad.left - 8, y: yPos + 4,
+          &quot;text-anchor&quot;: &quot;end&quot;,
+          &quot;font-size&quot;: &quot;11&quot;,
+          fill: &quot;#64748b&quot;,
+          &quot;font-family&quot;: &quot;monospace&quot;
+        });
+        labelText.textContent = formatAxisTick(val);
+        svg.appendChild(labelText);
+      }
+
+      // Y 軸主線
+      svg.appendChild(createEl(&quot;line&quot;, {
+        x1: pad.left, y1: pad.top, x2: pad.left, y2: pad.top + plotH,
+        stroke: &quot;#cbd5e1&quot;, &quot;stroke-width&quot;: &quot;1&quot;
+      }));
+
+      // 3. 繪製區段界限 (UCL, CL, LCL)
+      function drawLimitSegment(startIdx, endIdx, isPhase2) {
+        if (endIdx &lt;= startIdx) return;
+        const step = plotW / n;
+
+        let uclPath = &quot;&quot;, clPath = &quot;&quot;, lclPath = &quot;&quot;;
+        for (let i = startIdx; i &lt; endIdx; i++) {
+          const cx = getX(i);
+          const leftEdge = (i === startIdx) ? (i === 0 ? pad.left : cx - step / 2) : cx - step / 2;
+          const rightEdge = (i === endIdx - 1) ? (i === n - 1 ? width - pad.right : cx + step / 2) : cx + step / 2;
+
+          const yU = getY(ucl[i]);
+          const yC = getY(cl[i]);
+          const yL = getY(lcl[i]);
+
+          if (isStepLimit) {
+            uclPath += (i === startIdx ? `M ${leftEdge} ${yU} L ${rightEdge} ${yU}` : ` L ${leftEdge} ${yU} L ${rightEdge} ${yU}`);
+            lclPath += (i === startIdx ? `M ${leftEdge} ${yL} L ${rightEdge} ${yL}` : ` L ${leftEdge} ${yL} L ${rightEdge} ${yL}`);
+          } else {
+            uclPath += (i === startIdx ? `M ${leftEdge} ${yU} L ${rightEdge} ${yU}` : ` L ${rightEdge} ${yU}`);
+            lclPath += (i === startIdx ? `M ${leftEdge} ${yL} L ${rightEdge} ${yL}` : ` L ${rightEdge} ${yL}`);
+          }
+          clPath += (i === startIdx ? `M ${leftEdge} ${yC} L ${rightEdge} ${yC}` : ` L ${rightEdge} ${yC}`);
+        }
+
+        const uclColor = isPhase2 ? &quot;#f87171&quot; : &quot;#ef4444&quot;;
+        const clColor = isPhase2 ? &quot;#10b981&quot; : &quot;#059669&quot;;
+        const dashStyle = isPhase2 ? &quot;3,3&quot; : &quot;6,4&quot;;
+
+        svg.appendChild(createEl(&quot;path&quot;, {
+          d: uclPath, fill: &quot;none&quot;, stroke: uclColor, &quot;stroke-width&quot;: &quot;2&quot;, &quot;stroke-dasharray&quot;: dashStyle
+        }));
+        svg.appendChild(createEl(&quot;path&quot;, {
+          d: clPath, fill: &quot;none&quot;, stroke: clColor, &quot;stroke-width&quot;: &quot;2.2&quot;
+        }));
+        svg.appendChild(createEl(&quot;path&quot;, {
+          d: lclPath, fill: &quot;none&quot;, stroke: uclColor, &quot;stroke-width&quot;: &quot;2&quot;, &quot;stroke-dasharray&quot;: dashStyle
+        }));
+      }
+
+      if (hasTwoPhases) {
+        drawLimitSegment(0, baseLength, false);
+        drawLimitSegment(baseLength, n, true);
+
+        // 分界線
+        const splitX = pad.left + (plotW / n) * baseLength;
+        svg.appendChild(createEl(&quot;line&quot;, {
+          x1: splitX, y1: pad.top, x2: splitX, y2: pad.top + plotH,
+          stroke: &quot;#f59e0b&quot;, &quot;stroke-width&quot;: &quot;2&quot;, &quot;stroke-dasharray&quot;: &quot;5,4&quot;
+        }));
+        const badgeBg = createEl(&quot;rect&quot;, {
+          x: splitX - 66, y: pad.top - 16, width: 132, height: 18, rx: 4,
+          fill: &quot;#fef3c7&quot;, stroke: &quot;#fde68a&quot;, &quot;stroke-width&quot;: &quot;1&quot;
+        });
+        svg.appendChild(badgeBg);
+        const badgeTxt = createEl(&quot;text&quot;, {
+          x: splitX, y: pad.top - 4, &quot;text-anchor&quot;: &quot;middle&quot;,
+          &quot;font-size&quot;: &quot;10&quot;, &quot;font-weight&quot;: &quot;700&quot;, fill: &quot;#b45309&quot;, &quot;font-family&quot;: &quot;sans-serif&quot;
+        });
+        badgeTxt.textContent = &quot;Phase I / Phase II 分界線&quot;;
+        svg.appendChild(badgeTxt);
+      } else {
+        drawLimitSegment(0, n, false);
+      }
+
+      // 4. 繪製指標折線
+      let dataPath = &quot;&quot;;
+      let started = false;
+      for (let i = 0; i &lt; n; i++) {
+        const val = values[i];
+        if (val === null || val === undefined || isNaN(val)) {
+          started = false;
+          continue;
+        }
+        const px = getX(i);
+        const py = getY(val);
+        dataPath += (!started ? `M ${px} ${py}` : ` L ${px} ${py}`);
+        started = true;
+      }
+      if (dataPath) {
+        svg.appendChild(createEl(&quot;path&quot;, {
+          d: dataPath, fill: &quot;none&quot;, stroke: &quot;#6366f1&quot;, &quot;stroke-width&quot;: &quot;2&quot;
+        }));
+      }
+
+      // 5. X 軸刻度標籤 (依點數自動間隔避免擁擠)
+      const labelStep = n &gt; 24 ? Math.ceil(n / 15) : 1;
+      for (let i = 0; i &lt; n; i++) {
+        if (i % labelStep !== 0 &amp;&amp; i !== n - 1) continue;
+        const px = getX(i);
+        const py = pad.top + plotH + 14;
+        const xLbl = createEl(&quot;text&quot;, {
+          x: px, y: py,
+          &quot;text-anchor&quot;: &quot;end&quot;,
+          &quot;font-size&quot;: &quot;10.5&quot;,
+          fill: &quot;#475569&quot;,
+          &quot;font-family&quot;: &quot;sans-serif&quot;,
+          transform: `rotate(-32 ${px} ${py})`
+        });
+        xLbl.textContent = labels[i];
+        svg.appendChild(xLbl);
+      }
+
+      // 6. 繪製數據點 (正常藍圓點 vs 異常紅菱形) 與 Hover 互動
+      const tooltipEl = document.getElementById(&#x27;spcTooltip&#x27;);
+      for (let i = 0; i &lt; n; i++) {
+        const val = values[i];
+        if (val === null || val === undefined || isNaN(val)) continue;
+
+        const px = getX(i);
+        const py = getY(val);
+        const vRules = violations ? violations[i] : [];
+        const isOut = isSecondary
+          ? (val &gt; ucl[i] || val &lt; lcl[i])
+          : (vRules &amp;&amp; vRules.length &gt; 0);
+
+        const phaseText = hasTwoPhases
+          ? (i &gt;= baseLength ? &quot;Phase II (改善後期)&quot; : &quot;Phase I (改善前期)&quot;)
+          : &quot;全期&quot;;
+        const zStr = (zScores &amp;&amp; zScores[i] !== null &amp;&amp; zScores[i] !== undefined)
+          ? `${zScores[i] &gt;= 0 ? &#x27;+&#x27; : &#x27;&#x27;}${zScores[i].toFixed(2)}σ`
+          : &#x27;N/A&#x27;;
+
+        let tipHtml = `&lt;div style=&quot;font-weight:700;color:#93c5fd;margin-bottom:2px;&quot;&gt;${labels[i]} (${phaseText})&lt;/div&gt;` +
+                      `&lt;div&gt;觀測值：&lt;b&gt;${valueFormatter(val)}&lt;/b&gt;&lt;/div&gt;` +
+                      `&lt;div&gt;中心線 (CL)：${valueFormatter(cl[i])}&lt;/div&gt;` +
+                      `&lt;div&gt;UCL (上限)：${valueFormatter(ucl[i])}&lt;/div&gt;` +
+                      `&lt;div&gt;LCL (下限)：${valueFormatter(lcl[i])}&lt;/div&gt;` +
+                      `&lt;div&gt;Z-Score：${zStr}&lt;/div&gt;`;
+
+        if (isOut) {
+          const reason = isSecondary
+            ? &quot;超出 3σ 全距變異界限&quot;
+            : `觸發 Rule ${vRules.join(&#x27;, Rule &#x27;)}`;
+          tipHtml += `&lt;div style=&quot;color:#fca5a5;font-weight:700;margin-top:4px;&quot;&gt;⚠️ ${reason}&lt;/div&gt;`;
+
+          // 紅色菱形標記
+          const r = 6.5;
+          const diamond = createEl(&quot;polygon&quot;, {
+            points: `${px},${py - r} ${px + r},${py} ${px},${py + r} ${px - r},${py}`,
+            fill: &quot;#dc2626&quot;,
+            stroke: &quot;#ffffff&quot;,
+            &quot;stroke-width&quot;: &quot;1.5&quot;,
+            style: &quot;cursor:pointer;&quot;
+          });
+          svg.appendChild(diamond);
+        } else {
+          tipHtml += `&lt;div style=&quot;color:#6ee7b7;font-weight:600;margin-top:4px;&quot;&gt;✓ 流程受控 (In-Control)&lt;/div&gt;`;
+          const circle = createEl(&quot;circle&quot;, {
+            cx: px, cy: py, r: 4.5,
+            fill: &quot;#2563eb&quot;,
+            stroke: &quot;#ffffff&quot;,
+            &quot;stroke-width&quot;: &quot;1.2&quot;,
+            style: &quot;cursor:pointer;&quot;
+          });
+          svg.appendChild(circle);
+        }
+
+        // 擴大感應熱區方便滑鼠與觸控檢視
+        const hitArea = createEl(&quot;circle&quot;, {
+          cx: px, cy: py, r: 12,
+          fill: &quot;transparent&quot;,
+          style: &quot;cursor:pointer;&quot;
+        });
+
+        hitArea.addEventListener(&quot;mouseenter&quot;, () =&gt; {
+          tooltipEl.innerHTML = tipHtml;
+          tooltipEl.style.display = &quot;block&quot;;
+        });
+        hitArea.addEventListener(&quot;mousemove&quot;, (e) =&gt; {
+          const offsetX = (e.clientX + 260 &gt; window.innerWidth) ? -250 : 14;
+          const offsetY = (e.clientY + 140 &gt; window.innerHeight) ? -120 : 14;
+          tooltipEl.style.left = `${e.clientX + offsetX}px`;
+          tooltipEl.style.top = `${e.clientY + offsetY}px`;
+        });
+        hitArea.addEventListener(&quot;mouseleave&quot;, () =&gt; {
+          tooltipEl.style.display = &quot;none&quot;;
+        });
+
+        svg.appendChild(hitArea);
+      }
+
+      container.appendChild(svg);
+      return svg;
+    }
+
+    function formatAxisTick(val) {
+      if (Math.abs(val) &lt; 0.01 &amp;&amp; val !== 0) return val.toFixed(5);
+      if (Math.abs(val) &lt; 1) return val.toFixed(4);
+      return Number(val.toFixed(2)).toString();
+    }
+
+    // --- 7. 總控計算與雙圖表、診斷清單聯動 ---
+    function recalculateAndRender() {
+      const stats = computeSPCStatistics();
+      const chartContainer = document.getElementById(&#x27;chartContainer&#x27;);
+      const secContainer = document.getElementById(&#x27;secondaryChartContainer&#x27;);
+
+      if (stats.error) {
+        showAlert(stats.error);
+        chartContainer.innerHTML = `&lt;div style=&quot;padding:3rem 1rem;text-align:center;color:#94a3b8;font-size:0.875rem;&quot;&gt;${stats.error}&lt;/div&gt;`;
+        secContainer.classList.add(&#x27;hidden&#x27;);
+        lastRenderedPrimarySVG = null;
+        lastRenderedSecondarySVG = null;
+        renderDiagnosticTable(null, []);
+        return;
+      }
+
+      const violations = evaluateNelsonRules(stats);
+      const isStepLimit = (chartType === &#x27;u&#x27; || chartType === &#x27;p&#x27;);
+
+      const chartTitleMap = {
+        &#x27;u&#x27;: &#x27;u 管制圖&#x27;,
+        &#x27;p&#x27;: &#x27;p 管制圖&#x27;,
+        &#x27;c&#x27;: &#x27;c 管制圖&#x27;,
+        &#x27;np&#x27;: &#x27;np 管制圖&#x27;,
+        &#x27;g&#x27;: &#x27;g 管制圖 (罕見事件間隔天數)&#x27;,
+        &#x27;imr&#x27;: &#x27;I 管制圖 (個別值 Individual)&#x27;,
+        &#x27;xbar-r&#x27;: &#x27;X̄ 管制圖 (子群平均值)&#x27;
+      };
+
+      const dateRangeStr = stats.labels.length &gt; 0
+        ? ` (${stats.labels[0]} ~ ${stats.labels[stats.labels.length - 1]})`
+        : &#x27;&#x27;;
+
+      const valFormatter = (v) =&gt; {
+        if (chartType === &#x27;u&#x27;) return `${(v * 1000).toFixed(2)} ‰ (${v.toFixed(5)})`;
+        if (chartType === &#x27;p&#x27;) return `${(v * 100).toFixed(2)}%`;
+        if (chartType === &#x27;g&#x27;) return `${v.toFixed(1)} 天`;
+        return v.toFixed(3);
+      };
+
+      lastRenderedPrimarySVG = renderOfflineSPCChart({
+        containerId: &#x27;chartContainer&#x27;,
+        title: `${chartTitleMap[chartType]}${dateRangeStr}`,
+        labels: stats.labels,
+        values: stats.x,
+        cl: stats.cl,
+        ucl: stats.ucl,
+        lcl: stats.lcl,
+        zScores: stats.zScores,
+        violations: violations,
+        baseLength: stats.baseLength,
+        hasTwoPhases: stats.hasTwoPhases,
+        isStepLimit: isStepLimit,
+        height: 400,
+        valueFormatter: valFormatter,
+        isSecondary: false
+      });
+
+      // 計量值管制圖 (I-MR 與 Xbar-R) 同步繪製下方全距圖
+      if (chartType === &#x27;imr&#x27; || chartType === &#x27;xbar-r&#x27;) {
+        secContainer.classList.remove(&#x27;hidden&#x27;);
+        const secTitle = chartType === &#x27;imr&#x27; ? &#x27;MR 管制圖 (移動全距 Moving Range)&#x27; : &#x27;R 管制圖 (子群全距 Range)&#x27;;
+        lastRenderedSecondarySVG = renderOfflineSPCChart({
+          containerId: &#x27;secondaryChartContainer&#x27;,
+          title: secTitle,
+          labels: stats.labels,
+          values: stats.rVals,
+          cl: stats.rCl,
+          ucl: stats.rUcl,
+          lcl: stats.rLcl,
+          zScores: stats.rZScores,
+          violations: null,
+          baseLength: stats.baseLength,
+          hasTwoPhases: stats.hasTwoPhases,
+          isStepLimit: false,
+          height: 290,
+          valueFormatter: (v) =&gt; v.toFixed(3),
+          isSecondary: true
+        });
+      } else {
+        secContainer.classList.add(&#x27;hidden&#x27;);
+        secContainer.innerHTML = &#x27;&#x27;;
+        lastRenderedSecondarySVG = null;
+      }
+
+      renderDiagnosticTable(stats, violations);
+    }
+
+    function renderDiagnosticTable(stats, violations) {
+      const tbody = document.getElementById(&#x27;diagnosticTableBody&#x27;);
+      const badge = document.getElementById(&#x27;violationBadge&#x27;);
+      tbody.innerHTML = &#x27;&#x27;;
+
+      if (!stats || stats.error) {
+        badge.className = &#x27;badge-warn&#x27;;
+        badge.textContent = &#x27;無法進行變異檢定&#x27;;
+        tbody.innerHTML = `&lt;tr&gt;&lt;td colspan=&quot;6&quot; class=&quot;text-center&quot; style=&quot;padding:1.5rem;color:#94a3b8;&quot;&gt;請先確認左側輸入數據正確無誤。&lt;/td&gt;&lt;/tr&gt;`;
+        return;
+      }
+
+      let totalViolationPoints = 0;
+      let totalViolationRules = 0;
+
+      for (let i = 0; i &lt; stats.x.length; i++) {
+        const rules = violations[i];
+        if (rules.length &gt; 0) {
+          totalViolationPoints++;
+          totalViolationRules += rules.length;
+
+          const tr = document.createElement(&#x27;tr&#x27;);
+          tr.style.backgroundColor = &#x27;rgba(254, 242, 242, 0.5)&#x27;;
+
+          let obsStr = stats.x[i].toFixed(4);
+          let clStr = stats.cl[i].toFixed(4);
+          if (chartType === &#x27;u&#x27;) {
+            obsStr = `${(stats.x[i] * 1000).toFixed(2)} ‰`;
+            clStr = `${(stats.cl[i] * 1000).toFixed(2)} ‰`;
+          } else if (chartType === &#x27;p&#x27;) {
+            obsStr = `${(stats.x[i] * 100).toFixed(2)}%`;
+            clStr = `${(stats.cl[i] * 100).toFixed(2)}%`;
+          } else if (chartType === &#x27;g&#x27;) {
+            obsStr = `${stats.x[i]} 天`;
+            clStr = `${stats.cl[i].toFixed(1)} 天`;
+          }
+
+          const zVal = stats.zScores[i];
+          const zSign = zVal &gt;= 0 ? &#x27;+&#x27; : &#x27;&#x27;;
+          const ruleDescHtml = rules.map(r =&gt; `&lt;div style=&quot;color:#b91c1c;font-weight:500;&quot;&gt;• ${NELSON_DESCRIPTIONS[r]}&lt;/div&gt;`).join(&#x27;&#x27;);
+
+          tr.innerHTML = `
+            &lt;td class=&quot;font-mono&quot; style=&quot;padding:0.5rem 0.75rem;color:#64748b;&quot;&gt;#${i + 1}&lt;/td&gt;
+            &lt;td style=&quot;padding:0.5rem 0.75rem;font-weight:700;color:#1e293b;&quot;&gt;${stats.labels[i]}&lt;/td&gt;
+            &lt;td class=&quot;text-right font-mono&quot; style=&quot;padding:0.5rem 0.75rem;font-weight:700;color:#dc2626;&quot;&gt;${obsStr}&lt;/td&gt;
+            &lt;td class=&quot;text-right font-mono&quot; style=&quot;padding:0.5rem 0.75rem;color:#475569;&quot;&gt;${clStr}&lt;/td&gt;
+            &lt;td class=&quot;text-right font-mono&quot; style=&quot;padding:0.5rem 0.75rem;font-weight:700;color:#e11d48;&quot;&gt;${zSign}${zVal.toFixed(2)}σ&lt;/td&gt;
+            &lt;td style=&quot;padding:0.5rem 0.75rem;line-height:1.45;&quot;&gt;${ruleDescHtml}&lt;/td&gt;
+          `;
+          tbody.appendChild(tr);
+        }
+      }
+
+      if (totalViolationPoints === 0) {
+        badge.className = &#x27;badge-ok&#x27;;
+        badge.textContent = &#x27;目前流程受控 (0 項異常)&#x27;;
+        tbody.innerHTML = `&lt;tr&gt;&lt;td colspan=&quot;6&quot; class=&quot;text-center&quot; style=&quot;padding:1.5rem;color:#94a3b8;&quot;&gt;所有數據點皆落在統計管制界限內，未觸發任何啟用之 Nelson Rules。&lt;/td&gt;&lt;/tr&gt;`;
+      } else {
+        badge.className = &#x27;badge-warn&#x27;;
+        badge.textContent = `警報：共 ${totalViolationPoints} 點出現特殊原因變異 (${totalViolationRules} 項違規)`;
+      }
+    }
+
+    // --- 8. 純離線 CSV / Excel 匯入與範本產生引擎 ---
+    function setupDragAndDrop() {
+      const dropZone = document.getElementById(&#x27;dropZone&#x27;);
+      [&#x27;dragenter&#x27;, &#x27;dragover&#x27;, &#x27;dragleave&#x27;, &#x27;drop&#x27;].forEach(evtName =&gt; {
+        dropZone.addEventListener(evtName, (e) =&gt; {
+          e.preventDefault();
+          e.stopPropagation();
+        });
+      });
+      [&#x27;dragenter&#x27;, &#x27;dragover&#x27;].forEach(evtName =&gt; {
+        dropZone.addEventListener(evtName, () =&gt; dropZone.classList.add(&#x27;drag-active&#x27;));
+      });
+      [&#x27;dragleave&#x27;, &#x27;drop&#x27;].forEach(evtName =&gt; {
+        dropZone.addEventListener(evtName, () =&gt; dropZone.classList.remove(&#x27;drag-active&#x27;));
+      });
+      dropZone.addEventListener(&#x27;drop&#x27;, (e) =&gt; {
+        const files = e.dataTransfer.files;
+        if (files &amp;&amp; files.length &gt; 0) {
+          processOfflineFile(files[0]);
+        }
+      });
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        processOfflineFile(file);
+        event.target.value = &#x27;&#x27;;
+      }
+    }
+
+    // 將全型數字、小數點與斜線轉為半型，並移除千分位逗號
+    function normalizeHalfWidth(val) {
+      if (val === undefined || val === null) return &#x27;&#x27;;
+      return String(val)
+        .replace(/[\uFF10-\uFF19]/g, ch =&gt; String.fromCharCode(ch.charCodeAt(0) - 0xFEE0))
+        .replace(/．/g, &#x27;.&#x27;)
+        .replace(/／/g, &#x27;/&#x27;)
+        .replace(/－/g, &#x27;-&#x27;)
+        .replace(/,/g, &#x27;&#x27;)
+        .trim();
+    }
+
+    // 支援純離線解析：現代 Excel (.xlsx 二進位 ZIP 結構)、Excel XML (.xls)、以及 CSV/TSV
+    async function processOfflineFile(file) {
+      try {
+        const buffer = await file.arrayBuffer();
+        const bytes = new Uint8Array(buffer);
+        let rows = [];
+
+        // 1. 偵測是否為現代 Excel (.xlsx) 的 PK ZIP 檔頭 (0x50 0x4B 0x03 0x04)
+        if (bytes.length &gt;= 4 &amp;&amp; bytes[0] === 0x50 &amp;&amp; bytes[1] === 0x4B &amp;&amp; bytes[2] === 0x03 &amp;&amp; bytes[3] === 0x04) {
+          rows = await parseXlsxBinaryOffline(bytes);
+        } else {
+          // 2. 偵測是否為舊版複合二進位 .xls (OLE2: D0 CF 11 E0)
+          if (bytes.length &gt;= 4 &amp;&amp; bytes[0] === 0xD0 &amp;&amp; bytes[1] === 0xCF &amp;&amp; bytes[2] === 0x11 &amp;&amp; bytes[3] === 0xE0) {
+            showAlert(&quot;偵測到舊版 Excel 97-2003 二進位格式 (.xls)，請在 Excel 中「另存新檔」為現代 Excel 活頁簿 (.xlsx) 或 CSV (.csv) 後再匯入！&quot;);
+            return;
+          }
+
+          // 3. 解碼文字內容 (支援 UTF-8 與 Big5 繁體中文 CSV)
+          let text = &#x27;&#x27;;
+          try {
+            text = new TextDecoder(&#x27;utf-8&#x27;, { fatal: true }).decode(bytes);
+          } catch (e) {
+            text = new TextDecoder(&#x27;big5&#x27;).decode(bytes);
+          }
+
+          // 4. Excel 2003 XML Spreadsheet (.xls 範本格式)
+          if (text.trim().startsWith(&#x27;&lt;?xml&#x27;) || text.includes(&#x27;&lt;Workbook&#x27;) || text.includes(&#x27;&lt;Row&gt;&#x27;)) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(text, &quot;text/xml&quot;);
+            const xmlRows = xmlDoc.getElementsByTagName(&quot;Row&quot;);
+            for (let i = 0; i &lt; xmlRows.length; i++) {
+              const cells = xmlRows[i].getElementsByTagName(&quot;Cell&quot;);
+              const rowArr = [];
+              let colCursor = 0;
+              for (let c = 0; c &lt; cells.length; c++) {
+                const idxAttr = cells[c].getAttribute(&quot;ss:Index&quot;) || cells[c].getAttribute(&quot;Index&quot;);
+                if (idxAttr) {
+                  const targetIdx = parseInt(idxAttr, 10) - 1;
+                  while (colCursor &lt; targetIdx) {
+                    rowArr.push(&#x27;&#x27;);
+                    colCursor++;
+                  }
+                }
+                const dataNode = cells[c].getElementsByTagName(&quot;Data&quot;)[0];
+                let val = dataNode ? dataNode.textContent.trim() : &#x27;&#x27;;
+                if (val.includes(&#x27;T00:00:00&#x27;)) val = val.split(&#x27;T&#x27;)[0].replace(/-/g, &#x27;/&#x27;);
+                rowArr.push(val);
+                colCursor++;
+              }
+              if (rowArr.length &gt; 0) rows.push(rowArr);
+            }
+          } else {
+            // 5. 純文字 CSV / TSV 解析（支援引號內逗號）
+            const cleanText = text.replace(/^\uFEFF/, &#x27;&#x27;);
+            const lines = cleanText.split(/\r?\n/).filter(l =&gt; l.trim() !== &#x27;&#x27;);
+            const delimiter = (lines[0] &amp;&amp; lines[0].includes(&#x27;\t&#x27;)) ? &#x27;\t&#x27; : &#x27;,&#x27;;
+            rows = lines.map(line =&gt; parseCsvLine(line, delimiter));
+          }
+        }
+
+        if (!rows || rows.length &lt; 1) {
+          showAlert(&quot;上傳的檔案內容為空！&quot;);
+          return;
+        }
+
+        // 智慧判斷第一列是否為標題列：若第 1 列的第 2 欄已具備有效數字或日期，則從第 0 列開始讀取
+        let startRowIdx = 1;
+        const firstRow = rows[0] || [];
+        const c0IsDate = firstRow[0] !== undefined &amp;&amp; !isNaN(parseDateString(formatPossibleExcelDate(normalizeHalfWidth(firstRow[0]))));
+        const c1IsDate = firstRow[1] !== undefined &amp;&amp; !isNaN(parseDateString(formatPossibleExcelDate(normalizeHalfWidth(firstRow[1]))));
+        const c1IsNum = firstRow[1] !== undefined &amp;&amp; String(firstRow[1]).trim() !== &#x27;&#x27; &amp;&amp; !isNaN(parseFloat(normalizeHalfWidth(firstRow[1])));
+        if ((chartType === &#x27;g&#x27; &amp;&amp; (c0IsDate || c1IsDate)) || (chartType !== &#x27;g&#x27; &amp;&amp; c1IsNum)) {
+          startRowIdx = 0;
+        }
+
+        const parsedData = [];
+        for (let i = startRowIdx; i &lt; rows.length; i++) {
+          const r = rows[i];
+          if (!r || r.length === 0) continue;
+          const hasAnyContent = r.some(cell =&gt; cell !== undefined &amp;&amp; cell !== null &amp;&amp; String(cell).trim() !== &#x27;&#x27;);
+          if (!hasAnyContent) continue;
+
+          const rawCol0 = r[0] !== undefined ? normalizeHalfWidth(r[0]) : &#x27;&#x27;;
+          const monthVal = rawCol0 !== &#x27;&#x27; ? formatPossibleExcelDate(rawCol0) : `第 ${parsedData.length + 1} 期`;
+
+          if (chartType === &#x27;xbar-r&#x27;) {
+            const samples = [];
+            for (let col = 1; col &lt; r.length; col++) {
+              const v = parseFloat(normalizeHalfWidth(r[col]));
+              if (!isNaN(v)) samples.push(v);
+            }
+            if (samples.length &lt; 2) continue;
+            const sum = samples.reduce((a, b) =&gt; a + b, 0);
+            const mean = sum / samples.length;
+            const range = Math.max(...samples) - Math.min(...samples);
+            parsedData.push({
+              month: monthVal,
+              num: Number(mean.toFixed(4)),
+              den: Number(range.toFixed(4)),
+              subgroupSize: samples.length
+            });
+          } else if (chartType === &#x27;g&#x27;) {
+            let dateStr = &#x27;&#x27;;
+            const c0Date = formatPossibleExcelDate(normalizeHalfWidth(r[0]));
+            const c1Date = r[1] !== undefined ? formatPossibleExcelDate(normalizeHalfWidth(r[1])) : &#x27;&#x27;;
+            if (!isNaN(parseDateString(c0Date))) {
+              dateStr = c0Date;
+            } else if (!isNaN(parseDateString(c1Date))) {
+              dateStr = c1Date;
+            }
+            if (!dateStr) continue;
+            parsedData.push({ month: dateStr, num: 0, den: 1 });
+          } else if (chartType === &#x27;c&#x27; || chartType === &#x27;imr&#x27;) {
+            const numVal = parseFloat(normalizeHalfWidth(r[1]));
+            if (isNaN(numVal)) continue;
+            parsedData.push({ month: monthVal, num: numVal, den: 1 });
+          } else {
+            const numVal = parseFloat(normalizeHalfWidth(r[1]));
+            const denStr = r[2] !== undefined ? normalizeHalfWidth(r[2]) : &#x27;&#x27;;
+            const denVal = denStr !== &#x27;&#x27; ? parseFloat(denStr) : 1;
+            if (isNaN(numVal)) continue;
+            parsedData.push({
+              month: monthVal,
+              num: numVal,
+              den: isNaN(denVal) ? 1 : denVal
+            });
+          }
+        }
+
+        if (parsedData.length &lt; 2) {
+          showAlert(&quot;無法從檔案解析出足夠的有效數值（至少需 2 筆），請確認欄位順序是否符合目前所選的管制圖！&quot;);
+          return;
+        }
+
+        currentData = parsedData;
+        if (chartType === &#x27;g&#x27;) recalculateRareEventIntervals();
+        renderDataTable();
+        recalculateAndRender();
+        showToastMessage(`離線匯入成功！已讀取 ${parsedData.length} 筆數據。`);
+      } catch (err) {
+        console.error(err);
+        showAlert(`檔案解析失敗：${err.message || &#x27;請確認檔案格式是否正確&#x27;}`);
+      }
+    }
+
+    // 解析 CSV 單行（支援雙引號包裹含逗號內容）
+    function parseCsvLine(line, delimiter) {
+      const result = [];
+      let current = &#x27;&#x27;;
+      let inQuotes = false;
+      for (let i = 0; i &lt; line.length; i++) {
+        const ch = line[i];
+        if (ch === &#x27;&quot;&#x27;) {
+          if (inQuotes &amp;&amp; line[i + 1] === &#x27;&quot;&#x27;) {
+            current += &#x27;&quot;&#x27;;
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (ch === delimiter &amp;&amp; !inQuotes) {
+          result.push(current.trim());
+          current = &#x27;&#x27;;
+        } else {
+          current += ch;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    }
+
+    // 將 Excel 日期序列號 (如 45662) 自動轉換為 YYYY/MM/DD
+    function formatPossibleExcelDate(val) {
+      if (val === undefined || val === null) return &#x27;&#x27;;
+      const str = String(val).trim();
+      if (/^\d{5}(\.\d+)?$/.test(str)) {
+        const serial = Math.floor(parseFloat(str));
+        if (serial &gt; 30000 &amp;&amp; serial &lt; 70000) {
+          const utcMs = Date.UTC(1899, 11, 30) + serial * 86400000;
+          const d = new Date(utcMs);
+          return `${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2, &#x27;0&#x27;)}/${String(d.getUTCDate()).padStart(2, &#x27;0&#x27;)}`;
+        }
+      }
+      return str;
+    }
+
+    // ==========================================================================
+    // 純原生零依賴 .xlsx (OpenXML ZIP + DecompressionStream) 離線解析器
+    // ==========================================================================
+    async function parseXlsxBinaryOffline(bytes) {
+      const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      const entries = {};
+
+      // 尋找 ZIP End of Central Directory (EOCD: 0x06054b50)
+      let eocdOffset = -1;
+      for (let i = bytes.length - 22; i &gt;= Math.max(0, bytes.length - 65557); i--) {
+        if (view.getUint32(i, true) === 0x06054b50) {
+          eocdOffset = i;
+          break;
+        }
+      }
+      if (eocdOffset === -1) throw new Error(&quot;無法識別的 .xlsx 壓縮結構&quot;);
+
+      const cdSize = view.getUint32(eocdOffset + 12, true);
+      const cdOffset = view.getUint32(eocdOffset + 16, true);
+      let ptr = cdOffset;
+      const decoder = new TextDecoder(&#x27;utf-8&#x27;);
+      let firstWorksheetName = null;
+
+      // 讀取 Central Directory 取得每個 XML 檔案的精確壓縮大小與偏移位置
+      while (ptr &lt; cdOffset + cdSize) {
+        if (view.getUint32(ptr, true) !== 0x02014b50) break;
+        const method = view.getUint16(ptr + 10, true);
+        const compSize = view.getUint32(ptr + 20, true);
+        const nameLen = view.getUint16(ptr + 28, true);
+        const extraLen = view.getUint16(ptr + 30, true);
+        const commentLen = view.getUint16(ptr + 32, true);
+        const localHeaderOffset = view.getUint32(ptr + 42, true);
+
+        const fileName = decoder.decode(bytes.subarray(ptr + 46, ptr + 46 + nameLen));
+        ptr += 46 + nameLen + extraLen + commentLen;
+
+        const isSharedStrings = (fileName === &#x27;xl/sharedStrings.xml&#x27;);
+        const isWorksheet = /^xl\/worksheets\/sheet\d+\.xml$/i.test(fileName);
+
+        if (isSharedStrings || isWorksheet) {
+          if (isWorksheet &amp;&amp; !firstWorksheetName) {
+            firstWorksheetName = fileName;
+          }
+          const lNameLen = view.getUint16(localHeaderOffset + 26, true);
+          const lExtraLen = view.getUint16(localHeaderOffset + 28, true);
+          const dataStart = localHeaderOffset + 30 + lNameLen + lExtraLen;
+          const compData = bytes.subarray(dataStart, dataStart + compSize);
+
+          if (method === 0) {
+            entries[fileName] = decoder.decode(compData);
+          } else if (method === 8) {
+            if (typeof DecompressionStream === &#x27;undefined&#x27;) {
+              throw new Error(&quot;目前瀏覽器版本過舊不支援內建解壓縮，請更新 Chrome 或改存為 CSV 匯入&quot;);
+            }
+            const ds = new DecompressionStream(&#x27;deflate-raw&#x27;);
+            const writer = ds.writable.getWriter();
+            writer.write(compData);
+            writer.close();
+            const outBuf = await new Response(ds.readable).arrayBuffer();
+            entries[fileName] = decoder.decode(outBuf);
+          }
+        }
+      }
+
+      // 優先讀取 sheet1.xml，若工作表曾重新命名或排序則自動讀取第一個工作表
+      const targetSheetXml = entries[&#x27;xl/worksheets/sheet1.xml&#x27;] || (firstWorksheetName ? entries[firstWorksheetName] : null);
+      if (!targetSheetXml) {
+        throw new Error(&quot;Excel 活頁簿中找不到有效的工作表資料&quot;);
+      }
+
+      const parser = new DOMParser();
+
+      // 1. 解析共用字串表 (sharedStrings.xml)
+      const sharedStrings = [];
+      if (entries[&#x27;xl/sharedStrings.xml&#x27;]) {
+        const ssDoc = parser.parseFromString(entries[&#x27;xl/sharedStrings.xml&#x27;], &#x27;text/xml&#x27;);
+        const siList = ssDoc.getElementsByTagName(&#x27;si&#x27;);
+        for (let i = 0; i &lt; siList.length; i++) {
+          const tNodes = siList[i].getElementsByTagName(&#x27;t&#x27;);
+          let combined = &#x27;&#x27;;
+          for (let j = 0; j &lt; tNodes.length; j++) {
+            combined += tNodes[j].textContent || &#x27;&#x27;;
+          }
+          sharedStrings.push(combined);
+        }
+      }
+
+      // 2. 解析工作表內容
+      const sheetDoc = parser.parseFromString(targetSheetXml, &#x27;text/xml&#x27;);
+      const rowNodes = sheetDoc.getElementsByTagName(&#x27;row&#x27;);
+      const resultRows = [];
+
+      for (let r = 0; r &lt; rowNodes.length; r++) {
+        const cNodes = rowNodes[r].getElementsByTagName(&#x27;c&#x27;);
+        const rowArr = [];
+        for (let c = 0; c &lt; cNodes.length; c++) {
+          const cell = cNodes[c];
+          const ref = cell.getAttribute(&#x27;r&#x27;) || &#x27;&#x27;;
+          const colIdx = excelColRefToIndex(ref);
+          const cellType = cell.getAttribute(&#x27;t&#x27;) || &#x27;&#x27;;
+
+          let val = &#x27;&#x27;;
+          const isNode = cell.getElementsByTagName(&#x27;is&#x27;)[0];
+          if (cellType === &#x27;inlineStr&#x27; || isNode) {
+            const tNodes = (isNode || cell).getElementsByTagName(&#x27;t&#x27;);
+            for (let t = 0; t &lt; tNodes.length; t++) {
+              val += tNodes[t].textContent || &#x27;&#x27;;
+            }
+          } else {
+            const vNode = cell.getElementsByTagName(&#x27;v&#x27;)[0];
+            if (vNode) {
+              const rawV = vNode.textContent;
+              if (cellType === &#x27;s&#x27;) {
+                val = sharedStrings[parseInt(rawV, 10)] ?? &#x27;&#x27;;
+              } else {
+                val = rawV;
+              }
+            }
+          }
+
+          if (colIdx &gt;= 0) {
+            while (rowArr.length &lt; colIdx) rowArr.push(&#x27;&#x27;);
+            rowArr[colIdx] = String(val).trim();
+          } else {
+            rowArr.push(String(val).trim());
+          }
+        }
+        resultRows.push(rowArr);
+      }
+
+      return resultRows;
+    }
+
+    // 將 Excel 儲存格座標 (如 &quot;A1&quot;, &quot;C5&quot;, &quot;AA2&quot;) 轉換為 0-based 欄位索引
+    function excelColRefToIndex(ref) {
+      const match = /^([A-Z]+)/i.exec(ref);
+      if (!match) return -1;
+      const letters = match[1].toUpperCase();
+      let idx = 0;
+      for (let i = 0; i &lt; letters.length; i++) {
+        idx = idx * 26 + (letters.charCodeAt(i) - 64);
+      }
+      return idx - 1;
+    }
+
+    // 離線產生標準 Excel XML Spreadsheet (.xls) 範本，無須外部套件即可雙擊用 Excel 開啟
+    function generateTemplateExcel() {
+      let templateRows = [];
+      let fileSuffix = chartType;
+
+      if (chartType === &#x27;u&#x27;) {
+        templateRows = [
+          [&#x27;月份&#x27;, &#x27;跌倒件數(分子)&#x27;, &#x27;住院人日數(分母)&#x27;],
+          [&#x27;2025/01&#x27;, 6, 8500],
+          [&#x27;2025/02&#x27;, 6, 7800],
+          [&#x27;2025/03&#x27;, 3, 7200],
+          [&#x27;2025/04&#x27;, 9, 8100],
+          [&#x27;2025/05&#x27;, 6, 7300],
+          [&#x27;2025/06&#x27;, 6, 8800],
+          [&#x27;2025/07&#x27;, 4, 7300],
+          [&#x27;2025/08&#x27;, 3, 8000]
+        ];
+        fileSuffix = &#x27;u管制圖_單位缺點數範本&#x27;;
+      } else if (chartType === &#x27;p&#x27;) {
+        templateRows = [
+          [&#x27;月份&#x27;, &#x27;調劑疏失件數(分子)&#x27;, &#x27;總調劑處方張數(分母)&#x27;],
+          [&#x27;2025/01&#x27;, 24, 3800],
+          [&#x27;2025/02&#x27;, 15, 2700],
+          [&#x27;2025/03&#x27;, 22, 4200],
+          [&#x27;2025/04&#x27;, 22, 3700],
+          [&#x27;2025/05&#x27;, 24, 4400],
+          [&#x27;2025/06&#x27;, 10, 1900],
+          [&#x27;2025/07&#x27;, 15, 3000],
+          [&#x27;2025/08&#x27;, 16, 3800]
+        ];
+        fileSuffix = &#x27;p管制圖_不良率範本&#x27;;
+      } else if (chartType === &#x27;c&#x27;) {
+        templateRows = [
+          [&#x27;月份&#x27;, &#x27;針扎事件件數&#x27;],
+          [&#x27;2025/01&#x27;, 4],
+          [&#x27;2025/02&#x27;, 2],
+          [&#x27;2025/03&#x27;, 5],
+          [&#x27;2025/04&#x27;, 3],
+          [&#x27;2025/05&#x27;, 1],
+          [&#x27;2025/06&#x27;, 4],
+          [&#x27;2025/07&#x27;, 2],
+          [&#x27;2025/08&#x27;, 3]
+        ];
+        fileSuffix = &#x27;c管制圖_缺點數範本&#x27;;
+      } else if (chartType === &#x27;np&#x27;) {
+        templateRows = [
+          [&#x27;月份&#x27;, &#x27;病歷審查不合格份數&#x27;, &#x27;固定抽審總份數&#x27;],
+          [&#x27;2025/01&#x27;, 5, 100],
+          [&#x27;2025/02&#x27;, 3, 100],
+          [&#x27;2025/03&#x27;, 6, 100],
+          [&#x27;2025/04&#x27;, 4, 100],
+          [&#x27;2025/05&#x27;, 2, 100],
+          [&#x27;2025/06&#x27;, 5, 100],
+          [&#x27;2025/07&#x27;, 3, 100],
+          [&#x27;2025/08&#x27;, 4, 100]
+        ];
+        fileSuffix = &#x27;np管制圖_不良數範本&#x27;;
+      } else if (chartType === &#x27;g&#x27;) {
+        templateRows = [
+          [&#x27;事件序號&#x27;, &#x27;事件發生日期&#x27;],
+          [&#x27;事件 1 (起始基準)&#x27;, &#x27;2025/01/05&#x27;],
+          [&#x27;事件 2&#x27;, &#x27;2025/02/18&#x27;],
+          [&#x27;事件 3&#x27;, &#x27;2025/03/22&#x27;],
+          [&#x27;事件 4&#x27;, &#x27;2025/05/10&#x27;],
+          [&#x27;事件 5&#x27;, &#x27;2025/06/15&#x27;],
+          [&#x27;事件 6&#x27;, &#x27;2025/08/02&#x27;],
+          [&#x27;事件 7&#x27;, &#x27;2025/09/11&#x27;],
+          [&#x27;事件 8&#x27;, &#x27;2025/10/29&#x27;],
+          [&#x27;事件 9&#x27;, &#x27;2025/12/03&#x27;],
+          [&#x27;事件 10&#x27;, &#x27;2026/01/20&#x27;],
+          [&#x27;事件 11&#x27;, &#x27;2026/03/15&#x27;],
+          [&#x27;事件 12&#x27;, &#x27;2026/05/12&#x27;]
+        ];
+        fileSuffix = &#x27;g管制圖_罕見事件發生日期範本&#x27;;
+      } else if (chartType === &#x27;imr&#x27;) {
+        templateRows = [
+          [&#x27;月份&#x27;, &#x27;急診平均滯留時間_小時&#x27;],
+          [&#x27;2025/01&#x27;, 14.2],
+          [&#x27;2025/02&#x27;, 15.8],
+          [&#x27;2025/03&#x27;, 13.5],
+          [&#x27;2025/04&#x27;, 16.1],
+          [&#x27;2025/05&#x27;, 14.9],
+          [&#x27;2025/06&#x27;, 12.8],
+          [&#x27;2025/07&#x27;, 13.1],
+          [&#x27;2025/08&#x27;, 12.4]
+        ];
+        fileSuffix = &#x27;I-MR管制圖_個別值範本&#x27;;
+      } else if (chartType === &#x27;xbar-r&#x27;) {
+        templateRows = [
+          [&#x27;週&#x27;, &#x27;第1次&#x27;, &#x27;第2次&#x27;, &#x27;第3次&#x27;, &#x27;第4次&#x27;, &#x27;第5次&#x27;, &#x27;第6次&#x27;, &#x27;第7次&#x27;, &#x27;第8次&#x27;, &#x27;第9次&#x27;, &#x27;第10次&#x27;, &#x27;第11次&#x27;, &#x27;第12次&#x27;],
+          [&#x27;W1&#x27;, 13, 14, 12, 13, 11, 12, 12, 13, 14, 12, 13, 13],
+          [&#x27;W2&#x27;, 16, 18, 14, 15, 14, 16, 17, 19, 18, 14, 15, 16],
+          [&#x27;W3&#x27;, 15, 17, 16, 16, 15, 14, 16, 15, 15, 14, 14, 15],
+          [&#x27;W4&#x27;, 16, 16, 18, 17, 17, 15, 16, 17, 19, 18, 16, 17],
+          [&#x27;W5&#x27;, 18, 19, 17, 18, 18, 19, 19, 18, 17, 17, 19, 18],
+          [&#x27;W6&#x27;, 17, 18, 17, 18, 17, 19, 19, 17, 18, 18, 19, 18],
+          [&#x27;W7&#x27;, 18, 18, 19, 20, 19, 19, 18, 18, 19, 18, 19, 19],
+          [&#x27;W8&#x27;, 16, 16, 17, 15, 15, 17, 16, 15, 14, 15, 16, 16],
+          [&#x27;W9&#x27;, 13, 15, 15, 12, 15, 15, 16, 15, 14, 16, 14, 15],
+          [&#x27;W10&#x27;, 15, 15, 14, 13, 15, 14, 14, 13, 14, 14, 13, 14],
+          [&#x27;W11&#x27;, 15, 14, 15, 16, 16, 16, 15, 14, 15, 15, 14, 15],
+          [&#x27;W12&#x27;, 14, 13, 13, 12, 14, 13, 13, 14, 12, 12, 11, 11],
+          [&#x27;W13&#x27;, 11, 11, 11, 10, 9, 10, 11, 10, 11, 10, 10, 11],
+          [&#x27;W14&#x27;, 10, 11, 10, 10, 9, 11, 10, 10, 10, 10, 10, 9],
+          [&#x27;W15&#x27;, 11, 10, 10, 10, 10, 9, 10, 9, 10, 11, 10, 10],
+          [&#x27;W16&#x27;, 10, 11, 9, 9, 9, 9, 10, 10, 9, 11, 10, 9],
+          [&#x27;W17&#x27;, 11, 10, 10, 10, 9, 9, 9, 10, 9, 10, 10, 10],
+          [&#x27;W18&#x27;, 10, 11, 11, 10, 11, 10, 10, 10, 9, 9, 10, 9]
+        ];
+        fileSuffix = &#x27;Xbar-R管制圖_子群抽樣範本&#x27;;
+      }
+
+      // 建構標準 Excel 2003 XML Spreadsheet (100% 離線產生，Excel 直接雙擊開啟無亂碼)
+      let xmlRows = templateRows.map(row =&gt; {
+        const cells = row.map(val =&gt; {
+          const isNum = typeof val === &#x27;number&#x27;;
+          const typeAttr = isNum ? &#x27;Number&#x27; : &#x27;String&#x27;;
+          const escaped = String(val).replace(/&amp;/g, &#x27;&amp;amp;&#x27;).replace(/&lt;/g, &#x27;&amp;lt;&#x27;).replace(/&gt;/g, &#x27;&amp;gt;&#x27;);
+          return `&lt;Cell&gt;&lt;Data ss:Type=&quot;${typeAttr}&quot;&gt;${escaped}&lt;/Data&gt;&lt;/Cell&gt;`;
+        }).join(&#x27;&#x27;);
+        return `&lt;Row&gt;${cells}&lt;/Row&gt;`;
+      }).join(&#x27;\n&#x27;);
+
+      const xmlContent = `&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;?mso-application progid=&quot;Excel.Sheet&quot;?&gt;
+&lt;Workbook xmlns=&quot;urn:schemas-microsoft-com:office:spreadsheet&quot;
+ xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot;
+ xmlns:x=&quot;urn:schemas-microsoft-com:office:excel&quot;
+ xmlns:ss=&quot;urn:schemas-microsoft-com:office:spreadsheet&quot;&gt;
+ &lt;Worksheet ss:Name=&quot;SPC數據範本&quot;&gt;
+  &lt;Table&gt;
+   ${xmlRows}
+  &lt;/Table&gt;
+ &lt;/Worksheet&gt;
+&lt;/Workbook&gt;`;
+
+      const blob = new Blob([xmlContent], { type: &#x27;application/vnd.ms-excel;charset=utf-8;&#x27; });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement(&#x27;a&#x27;);
+      link.href = url;
+      link.download = `臨床品管指標_${fileSuffix}.xls`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToastMessage(&quot;已下載離線標準 Excel 範本 (.xls)！&quot;);
+    }
+
+    // --- 9. 純離線高解析度 PNG 匯出引擎 (SVG 轉 Canvas 2x Retina 畫質) ---
+    function svgToImage(svgEl, targetW, targetH) {
+      return new Promise((resolve, reject) =&gt; {
+        const serializer = new XMLSerializer();
+        const svgStr = serializer.serializeToString(svgEl);
+        const svgBlob = new Blob([svgStr], { type: &#x27;image/svg+xml;charset=utf-8&#x27; });
+        const url = URL.createObjectURL(svgBlob);
+        const img = new Image();
+        img.onload = () =&gt; {
+          URL.revokeObjectURL(url);
+          resolve(img);
+        };
+        img.onerror = (err) =&gt; {
+          URL.revokeObjectURL(url);
+          reject(err);
+        };
+        img.src = url;
+      });
+    }
+
+    async function exportChartPNG() {
+      if (!lastRenderedPrimarySVG) {
+        showToastMessage(&quot;目前無可匯出的圖表！&quot;, true);
+        return;
+      }
+
+      const now = new Date();
+      const timeStamp = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,&#x27;0&#x27;)}${now.getDate().toString().padStart(2,&#x27;0&#x27;)}_${now.getHours().toString().padStart(2,&#x27;0&#x27;)}${now.getMinutes().toString().padStart(2,&#x27;0&#x27;)}`;
+      const filename = `醫院臨床品管SPC管制圖_${timeStamp}.png`;
+
+      try {
+        const exportW = 1200;
+        const h1 = 560;
+        const h2 = (lastRenderedSecondarySVG &amp;&amp; (chartType === &#x27;imr&#x27; || chartType === &#x27;xbar-r&#x27;)) ? 380 : 0;
+
+        const img1 = await svgToImage(lastRenderedPrimarySVG, exportW, h1);
+        const img2 = h2 &gt; 0 ? await svgToImage(lastRenderedSecondarySVG, exportW, h2) : null;
+
+        const canvas = document.createElement(&#x27;canvas&#x27;);
+        canvas.width = exportW;
+        canvas.height = h1 + h2;
+        const ctx = canvas.getContext(&#x27;2d&#x27;);
+        ctx.fillStyle = &#x27;#ffffff&#x27;;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img1, 0, 0, exportW, h1);
+        if (img2) {
+          ctx.drawImage(img2, 0, h1, exportW, h2);
+        }
+
+        const link = document.createElement(&#x27;a&#x27;);
+        link.download = filename;
+        link.href = canvas.toDataURL(&#x27;image/png&#x27;);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToastMessage(&quot;已匯出高解析度管制圖報表 (PNG)！&quot;);
+      } catch (err) {
+        console.error(err);
+        showToastMessage(&quot;匯出圖表失敗，請稍後再試。&quot;, true);
+      }
+    }
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;"></iframe>
 </div>
 <footer>
   條號與評量項目序號依據「113 年度醫院評鑑基準及評量項目、委員共識（醫學中心適用）」；標註（試）者為該年度試評項目。指標的過程面／結果面分類、事件與條文的對應為整理者所擬，供院內模擬評鑑使用，正式評鑑請以當年度公告版本為準。
@@ -844,7 +3545,10 @@ function renderOverview(){
   $('o-lede').innerHTML=`2024年1月–2026年9月，本院 <b>${all.length}</b> 支每月皆有分子分母的指標中，<b>${all.filter(x=>x.out_n>0).length}</b> 支曾有月份超出管制界限，<b>${all.filter(x=>x.recent).length}</b> 支在 2026 年出現特殊原因變異。`;
 }
 function oMove(d){const rows=oRows();if(!rows.length)return;const i=rows.findIndex(r=>r.code===os.code);os.code=rows[(i<0?0:i+d+rows.length)%rows.length].code;renderOverview();const tr=document.querySelector('#o-body tr.sel');if(tr)tr.scrollIntoView({block:'nearest'})}
-function setView(v){try{history.replaceState(null,'',v==='spc'?'#spc':location.pathname+location.search)}catch(e){}document.querySelectorAll('.viewtab').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));$('view-q').hidden=v!=='q';$('view-spc').hidden=v!=='spc';if(v==='spc')renderOverview();else if(ps.ind)renderPfmChart()}
+function ntuFit(){const f=$('ntu-frame');try{const d=f.contentDocument;if(d&&d.body){const h=Math.ceil(d.body.getBoundingClientRect().height);if(h>0)f.style.height=h+'px'}}catch(e){}}
+function ntuShow(){const f=$('ntu-frame');try{const w=f.contentWindow;if(w&&typeof w.recalculateAndRender==='function')w.recalculateAndRender()}catch(e){}ntuFit()}
+function initNtu(){const f=$('ntu-frame');const hook=()=>{try{const d=f.contentDocument;if(window.ResizeObserver&&d&&d.body)new ResizeObserver(ntuFit).observe(d.body);}catch(e){}if(!$('view-ntu').hidden)ntuShow();else ntuFit()};if(f.contentDocument&&f.contentDocument.readyState==='complete'&&f.contentDocument.body&&f.contentDocument.body.childElementCount)hook();else f.addEventListener('load',hook)}
+function setView(v){if(!['q','spc','ntu'].includes(v))v='q';try{history.replaceState(null,'',v==='q'?location.pathname+location.search:'#'+v)}catch(e){}document.querySelectorAll('.viewtab').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));$('view-q').hidden=v!=='q';$('view-spc').hidden=v!=='spc';$('view-ntu').hidden=v!=='ntu';if(v==='spc')renderOverview();else if(v==='ntu')ntuShow();else if(ps.ind)renderPfmChart()}
 function initSpc(){
   $('inds').addEventListener('click',e=>{const b=e.target.closest('.spcbtn');if(b){e.stopPropagation();openInd(b.dataset.i)}});
   $('spc-codes').addEventListener('click',e=>{const b=e.target.closest('[data-code]');if(b){ps.code=b.dataset.code;renderPfmChart()}});
@@ -863,7 +3567,7 @@ function initSpc(){
   let t;window.addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(()=>{if(!$('view-spc').hidden)renderOverview();else if(ps.ind)renderPfmChart()},150)});
 }
 
-build();initSpc();setCase(D.CASES[0].k);if(location.hash==='#spc')setView('spc');window.addEventListener('hashchange',()=>setView(location.hash==='#spc'?'spc':'q'));
+build();initSpc();initNtu();setCase(D.CASES[0].k);if(location.hash==='#spc'||location.hash==='#ntu')setView(location.hash.slice(1));window.addEventListener('hashchange',()=>setView(location.hash.slice(1)||'q'));
 </script>
 </body>
 </html>
