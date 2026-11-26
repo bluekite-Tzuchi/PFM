@@ -403,7 +403,7 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
           ・同儕加權平均值：取自綜合照護指標個別群組報表（比較群組：醫學中心），統計區間內各月「總分子」合計 ÷「總分母」合計，算法與本院計算平均值一致。<br>
           ・同儕第25／50／75百分位：報表只提供每月的百分位、沒有各院數值，無法直接算整段期間的百分位，因此取統計區間內各月百分位的中位數。<br>
           ・報表在同儕家數不足 5 家的月份不提供同儕值，這些月份不納入；整段期間都沒有同儕值的指標顯示「無同儕值」。需要時可按「輸入／匯入同儕值」在本機補上或覆蓋。<br>
-          ・中心線為 0% 或 100%（u 管制圖為 0）時標準差為 0，管制界限無法計算，清單顯示「無法判定」；同儕百分位在罕見事件指標常為 0%、在遵從率指標常為 100%，這類指標建議改看同儕加權平均值。<br>
+          ・所選基準為 0% 或 100%（u 管制圖為 0）時，無法由中心線本身計算標準差：中心線維持所選值，σ 改以本院計算平均值計算，管制界限寬度與本院計算平均值的管制圖相同、只是位置平移。同儕百分位在罕見事件指標常為 0%、在遵從率指標常為 100%，本院穩定平均值在罕見事件指標也可能為 0%。若本院計算平均值本身也是 0% 或 100%（全期沒有變異），則無法計算管制界限，清單顯示「無法判定」。<br>
           以指定值當中心線時，p 管制圖每月 σ＝√(CL×(1−CL)÷當月分母)，u 管制圖 σ＝√(CL÷當月分母)，I 管制圖的 σ 仍以移動全距估計。</dd>
         <dt>p 管制圖</dt><dd>單位為 % 的比率指標。中心線＝該階段各月分子合計 ÷ 分母合計；每月管制界限依當月分母計算，分母越小界限越寬。</dd>
         <dt>u 管制圖</dt><dd>單位為 ‰ 的人日率指標（如感染、滑脫）；中心線與界限算法同上，以卜瓦松分布估計變異。</dd>
@@ -3634,14 +3634,16 @@ function peerAll(){if(peerData)return peerData;const loc=peerLocal(),o={};
   return peerData=o}
 const chartOf=code=>{const u=SP.codes[code].u;return u==='一般'?'I':u==='‰'?'u':'p'};
 const toInt=(code,v)=>SP.codes[code].u==='%'?v/100:v, toDisp=(code,v)=>SP.codes[code].u==='%'?v*100:v;
-function phasePts(rs,chart,scale,cl0){ // cl0：指定中心線（內部單位），未給則依資料計算
+function phasePts(rs,chart,scale,cl0,sb){ // sb：計算 σ 用的比率（內部單位），未給則用中心線
+ // cl0：指定中心線（內部單位），未給則依資料計算
   if(chart==='I'){
     const v=rs.map(r=>r.num/r.den),cl=cl0!=null?cl0:v.reduce((s,x)=>s+x,0)/v.length;let mr=0;
     for(let i=1;i<v.length;i++)mr+=Math.abs(v[i]-v[i-1]);
     const sd=v.length>1?mr/(v.length-1)/1.128:0;return v.map(x=>({value:x,cl,sd}));
   }
   const cbar=cl0!=null?cl0/scale:rs.reduce((s,r)=>s+r.num,0)/rs.reduce((s,r)=>s+r.den,0);
-  return rs.map(r=>{const n=r.den,sd=chart==='p'?Math.sqrt(Math.max(0,cbar*(1-cbar))/n):Math.sqrt(Math.max(0,cbar)/n);return{value:r.num/n*scale,cl:cbar*scale,sd:sd*scale}});
+  const sbar=sb!=null?sb/scale:cbar;
+  return rs.map(r=>{const n=r.den,sd=chart==='p'?Math.sqrt(Math.max(0,sbar*(1-sbar))/n):Math.sqrt(Math.max(0,sbar)/n);return{value:r.num/n*scale,cl:cbar*scale,sd:sd*scale}});
 }
 const limOf=(chart,scale)=>{const top=chart==='p'?scale:Infinity;return(p,m)=>Math.min(top,Math.max(0,p.cl+m*p.sd))};
 function rowsOf(code){const o=SP.codes[code];return SP.months.map((m,i)=>({month:m,num:o.num[i],den:o.den[i]}))}
@@ -3671,16 +3673,18 @@ function spc(code,mode,bm){
   if(spcCache[ck])return spcCache[ck];
   const o=SP.codes[code],unit=o.u,chart=chartOf(code),scale=chart==='u'?1000:1;
   const all=rowsOf(code),rare=isRare(code,all);
-  const t0=bm==='calc'?null:bmVals(code)[bm],edge=t0!=null&&((chart==='p'&&(t0<=0||t0>=1))||(chart==='u'&&t0<=0));
+  const isEdge=x=>x!=null&&((chart==='p'&&(x<=0||x>=1))||(chart==='u'&&x<=0));
+  const t0=bm==='calc'?null:bmVals(code)[bm],calc0=bmVals(code).calc,edge0=isEdge(t0);
+  const edge=edge0&&isEdge(calc0),borrow=edge0&&!edge; // borrow：所選基準為 0%／100%，σ 改用本院計算平均值
   const missing=bm!=='calc'&&(t0==null||edge),target=missing?null:t0;
   const exM=new Map(mode==='all'&&bm==='stable'?bmVals(code).stableEx.map(r=>[r.month,r.side]):[]);
   const cllab=mode!=='all'?null:(bm==='calc'||missing)?'全期中心線':BML[bm];
   const phases={};all.forEach(r=>{const k=mode==='all'?'all':r.month.slice(0,4);(phases[k]=phases[k]||[]).push(r)});
   const out=[],lim=limOf(chart,scale),eps=1e-12;
   for(const ph of Object.keys(phases).sort()){
-    const rs=phases[ph],pts=phasePts(rs,chart,scale,mode==='all'&&target!=null?target:undefined);
+    const rs=phases[ph],pts=phasePts(rs,chart,scale,mode==='all'&&target!=null?target:undefined,mode==='all'&&borrow?calc0:undefined);
     pts.forEach((p,i)=>{const r=rs[i],ucl=lim(p,K),lcl=lim(p,-K);
-      out.push({code,unit,chart,phase:ph,cllab,month:r.month,num:r.num,den:r.den,value:p.value,cl:p.cl,ucl,lcl,u2:lim(p,2),l2:lim(p,-2),u1:lim(p,1),l1:lim(p,-1),above:p.value>ucl+eps,below:p.value<lcl-eps,rare,missing,edge,excl:exM.has(r.month),z:p.sd>0?(p.value-p.cl)/p.sd:0})});
+      out.push({code,unit,chart,phase:ph,cllab,month:r.month,num:r.num,den:r.den,value:p.value,cl:p.cl,ucl,lcl,u2:lim(p,2),l2:lim(p,-2),u1:lim(p,1),l1:lim(p,-1),above:p.value>ucl+eps,below:p.value<lcl-eps,rare,missing,edge,borrow,excl:exM.has(r.month),z:p.sd>0?(p.value-p.cl)/p.sd:0})});
   }
   // Nelson 八規則（整條序列跨階段判定）
   const n=out.length,F=out.map(()=>new Set()),mark=(ix,k)=>ix.forEach(j=>F[j].add(k)),rng=(a,b)=>Array.from({length:b-a+1},(_,j)=>a+j);
@@ -3695,7 +3699,7 @@ function spc(code,mode,bm){
         if(i>=5&&rng(i-4,i).every(j=>sg*(v[j]-v[j-1])>1e-12))mark(rng(i-5,i),5);
       }
       if(i>=13){let ok=true;for(let j=i-11;j<=i&&ok;j++){if(!((v[j-1]-v[j-2])*(v[j]-v[j-1])<0))ok=false}if(ok)mark(rng(i-13,i),6)}
-      if(i>=14&&rng(i-14,i).every(j=>Math.abs(z[j])<1))mark(rng(i-14,i),7);
+      if(i>=14&&rng(i-14,i).every(j=>Math.abs(z[j])<1&&out[j].ucl>out[j].lcl))mark(rng(i-14,i),7);
       if(i>=7){const w=rng(i-7,i);if(w.every(j=>Math.abs(z[j])>1)&&w.some(j=>z[j]>0)&&w.some(j=>z[j]<0))mark(w,8)}
     }
   }
@@ -3711,7 +3715,7 @@ function summ(code,mode,bm){
   const pts=spc(code,mode,bm),o=SP.codes[code],cls={};let out_n=0,run_n=0,recent=0;const rs=new Set();
   pts.forEach(p=>{cls[p.phase]=p.cl;if(p.r1)out_n++;if(p.other)run_n++;if(p.sig&&p.month.slice(0,4)==='2026')recent++;p.rules.forEach(k=>rs.add(k))});
   const lab={p:'p 管制圖',u:'u 管制圖',I:'I 管制圖'}[pts[0].chart]+(pts[0].rare?'（罕見事件）':'');
-  return sumCache[ck]={mode,bm,missing:pts[0].missing,edge:pts[0].edge,code,name:o.n,group:o.g,unit:o.u,chart:lab,rare:pts[0].rare,cls,last:pts[pts.length-1],out_n,run_n,rules:[...rs].sort((a,b)=>a-b),recent:recent>0};
+  return sumCache[ck]={mode,bm,missing:pts[0].missing,edge:pts[0].edge,borrow:pts[0].borrow,code,name:o.n,group:o.g,unit:o.u,chart:lab,rare:pts[0].rare,cls,last:pts[pts.length-1],out_n,run_n,rules:[...rs].sort((a,b)=>a-b),recent:recent>0};
 }
 function niceTicks(lo,hi,n){const span=hi-lo||1,raw=span/n,p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p,st=(f<1.5?1:f<3?2:f<7?5:10)*p,t=[];for(let v=Math.ceil(lo/st)*st;v<=hi+st*1e-9;v+=st)t.push(+v.toPrecision(12));return t}
 const phLabel=(ph,a,b)=>ph==='all'?`全期　${a.slice(0,4)}年${+a.slice(5)}月–${b.slice(0,4)}年${+b.slice(5)}月（合併計算）`:`${ph}年${+a.slice(5)}–${+b.slice(5)}月`;
@@ -3758,7 +3762,7 @@ function drawChart(box,code,mode,bm){
   svg.onmouseleave=()=>{tip.hidden=true;hl.style.display='none'};
 }
 function metaLine(code,mode,bm){const s=summ(code,mode,bm),c=ph=>ph in s.cls?fmtv(s.unit,s.cls[ph]):'—';
-  return (s.missing?`<span class="bmwarn">${s.edge?`所選${BML[s.bm]}為 ${fmtv(s.unit,bmVals(code)[s.bm])}，中心線在 ${s.unit==='%'?'0% 或 100%':'0'} 時標準差為 0、無法計算管制界限`:`此指標沒有${BML[s.bm]}`}，圖一暫以本院計算平均值為中心線，不依所選基準判定。</span><br>`:'')+`${s.chart}　`+(mode==='all'?`${s.bm==='calc'||s.missing?'全期中心線':'中心線（'+BML[s.bm]+'）'} <b>${c('all')}</b>`:`中心線 2024年 <b>${c('2024')}</b>／2025年 <b>${c('2025')}</b>／2026年 <b>${c('2026')}</b>`)+`　最新月份 <b>${fmtv(s.unit,s.last.value)}</b>　超出管制界限 <b>${s.out_n}</b> 個月　符合規則 2–8 <b>${s.run_n}</b> 個月　曾觸發規則 <b>${s.rules.length?s.rules.join('·'):'—'}</b>`+(s.rare?'<br><span class="rare">罕見事件指標（平均每月不到一件）：只判讀是否超出管制上限（規則 1），不套用規則 2–8。</span>':'')}
+  return (s.missing?`<span class="bmwarn">${s.edge?`所選${BML[s.bm]}為 ${fmtv(s.unit,bmVals(code)[s.bm])}，且本院計算平均值也是 ${fmtv(s.unit,bmVals(code).calc)}（全期沒有變異），無法計算管制界限`:`此指標沒有${BML[s.bm]}`}，圖一暫以本院計算平均值為中心線，不依所選基準判定。</span><br>`:'')+(s.borrow?`<span class="bmwarn">所選${BML[s.bm]}為 ${fmtv(s.unit,bmVals(code)[s.bm])}，中心線在 ${s.unit==='%'?'0% 或 100%':'0'} 時無法由中心線本身計算標準差；中心線維持 ${fmtv(s.unit,bmVals(code)[s.bm])}，σ 改以本院計算平均值 ${fmtv(s.unit,bmVals(code).calc)} 計算（${s.unit==='%'?'√(p̄×(1−p̄)÷當月分母)':'√(ū÷當月分母)'}），管制界限寬度與本院計算平均值的管制圖相同。</span><br>`:'')+`${s.chart}　`+(mode==='all'?`${s.bm==='calc'||s.missing?'全期中心線':'中心線（'+BML[s.bm]+'）'} <b>${c('all')}</b>`:`中心線 2024年 <b>${c('2024')}</b>／2025年 <b>${c('2025')}</b>／2026年 <b>${c('2026')}</b>`)+`　最新月份 <b>${fmtv(s.unit,s.last.value)}</b>　超出管制界限 <b>${s.out_n}</b> 個月　符合規則 2–8 <b>${s.run_n}</b> 個月　曾觸發規則 <b>${s.rules.length?s.rules.join('·'):'—'}</b>`+(s.rare?'<br><span class="rare">罕見事件指標（平均每月不到一件）：只判讀是否超出管制上限（規則 1），不套用規則 2–8。</span>':'')}
 const LEGEND='<div class="legend"><span><i class="sw val"></i>本院每月數值</span><span><i class="sw cl"></i>中心線（各階段）</span><span><i class="sw s1"></i>±1σ</span><span><i class="sw s2"></i>±2σ</span><span><i class="sw lim"></i>管制上限／下限（±3σ）</span><span><i class="dot out"></i>超出管制界限</span><span><i class="dot run"></i>符合規則 2–8（滑到點上看規則）</span></div>';
 const spcBtn=i=>{const cs=SP.map[i]||[];return cs.length?`<button type="button" class="spcbtn" data-i="${esc(i)}" title="顯示本院管制圖">管制圖 ${cs.length}</button>`:`<span class="spcnone" title="綜合照護指標資料中沒有對應項目">無院內數據</span>`};
 const ps={ind:null,code:null}; // 情境頁的管制圖
@@ -3776,13 +3780,13 @@ const listSumm=c=>summ(c,...listArgs());
 function oRows(){return Object.keys(SP.codes).map(listSumm).filter(r=>(!os.group||r.group===os.group)&&(!os.q||r.code.toLowerCase().includes(os.q)||r.name.toLowerCase().includes(os.q))&&(!os.only||r.rules.length>0)&&(!os.rule||r.rules.includes(+os.rule)))}
 function renderOverview(){
   const rows=oRows();if(!os.code||!SP.codes[os.code])os.code=Object.keys(SP.codes)[0];
-  $('o-body').innerHTML=rows.map(r=>`<tr data-code="${r.code}" class="${r.code===os.code?'sel':''}"><td>${r.code}</td><td>${esc(r.name)}</td>${r.missing?(r.edge?'<td class="num">—</td><td class="rules" title="所選基準為 0% 或 100%，無法計算管制界限">無法判定</td><td>—</td>':'<td class="num">—</td><td class="rules" title="報表未提供同儕值">無同儕值</td><td>—</td>'):`<td class="num${r.out_n?' hot':''}">${r.out_n}</td><td class="rules${r.rules.length?' warn':''}">${r.rules.length?r.rules.join('·'):'—'}</td><td class="${r.recent?'hot':''}">${r.recent?'是':'否'}</td>`}</tr>`).join('')||'<tr><td colspan="5" class="empty">沒有符合條件的指標</td></tr>';
+  $('o-body').innerHTML=rows.map(r=>`<tr data-code="${r.code}" class="${r.code===os.code?'sel':''}"><td>${r.code}</td><td>${esc(r.name)}</td>${r.missing?(r.edge?'<td class="num">—</td><td class="rules" title="所選基準與本院計算平均值都是 0% 或 100%，無法計算管制界限">無法判定</td><td>—</td>':'<td class="num">—</td><td class="rules" title="報表未提供同儕值">無同儕值</td><td>—</td>'):`<td class="num${r.out_n?' hot':''}">${r.out_n}</td><td class="rules${r.rules.length?' warn':''}">${r.rules.length?r.rules.join('·'):'—'}</td><td class="${r.recent?'hot':''}">${r.recent?'是':'否'}</td>`}</tr>`).join('')||'<tr><td colspan="5" class="empty">沒有符合條件的指標</td></tr>';
   const s=summ(os.code);$('o-title').textContent=s.code+'　'+s.name;$('o-meta').innerHTML=metaLine(os.code);drawChart($('o-chart'),os.code);
   renderBm();
   $('o-meta-all').innerHTML=metaLine(os.code,'all',os.bm);drawChart($('o-chart-all'),os.code,'all',os.bm);
   const all=Object.keys(SP.codes).map(listSumm),ok=all.filter(x=>!x.missing),lab=BML[os.bm];
   $('o-lede').innerHTML=os.bm==='calc'?`${PERIOD}，本院 <b>${all.length}</b> 支每月皆有分子分母的指標中，<b>${all.filter(x=>x.out_n>0).length}</b> 支曾有月份超出管制界限，<b>${all.filter(x=>x.recent).length}</b> 支在 2026 年出現特殊原因變異。`
-    :`以「${lab}」為中心線（全期判定）：${PERIOD}，<b>${ok.length}</b> 支${os.bm==='stable'?'':'可依'+lab+'判定的'}指標中，<b>${ok.filter(x=>x.out_n>0).length}</b> 支曾有月份超出管制界限，<b>${ok.filter(x=>x.rules.length).length}</b> 支曾觸發 Nelson 規則，<b>${ok.filter(x=>x.recent).length}</b> 支在 2026 年出現特殊原因變異。`+((n1,n2)=>(n1?`另 <b>${n1}</b> 支沒有${lab}`:'')+(n1&&n2?'、':n2?'另 ':'')+(n2?`<b>${n2}</b> 支的${lab}為 0% 或 100%，無法計算管制界限`:'')+(n1||n2?'，未納入判定。':''))(all.filter(x=>x.missing&&!x.edge).length,all.filter(x=>x.edge).length);
+    :`以「${lab}」為中心線（全期判定）：${PERIOD}，<b>${ok.length}</b> 支${os.bm==='stable'?'':'可依'+lab+'判定的'}指標中，<b>${ok.filter(x=>x.out_n>0).length}</b> 支曾有月份超出管制界限，<b>${ok.filter(x=>x.rules.length).length}</b> 支曾觸發 Nelson 規則，<b>${ok.filter(x=>x.recent).length}</b> 支在 2026 年出現特殊原因變異。`+((n1,n2)=>(n1?`另 <b>${n1}</b> 支沒有${lab}`:'')+(n1&&n2?'、':n2?'另 ':'')+(n2?`<b>${n2}</b> 支的${lab}與本院計算平均值都是 0% 或 100%（全期沒有變異），無法計算管制界限`:'')+(n1||n2?'，未納入判定。':''))(all.filter(x=>x.missing&&!x.edge).length,all.filter(x=>x.edge).length)+((nb=>nb?`其中 <b>${nb}</b> 支的${lab}為 0% 或 100%，σ 改以本院計算平均值計算。`:'')(ok.filter(x=>x.borrow).length));
   $('o-basis').innerHTML=os.bm==='calc'?'清單的「超出」「規則」「2026」依圖二（年度分段）計算。':`清單的「超出」「規則」「2026」依圖一計算，中心線為所選的「<b>${lab}</b>」。`;
 }
 const PERIOD=(m=>`${m[0].slice(0,4)}年${+m[0].slice(5)}月–${m[m.length-1].slice(0,4)}年${+m[m.length-1].slice(5)}月`)(SP.months);
