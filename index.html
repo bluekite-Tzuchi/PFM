@@ -263,7 +263,36 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
 .fg-sum{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13.5px;color:var(--muted)}
 .fg-sum b{color:var(--ink);font-variant-numeric:tabular-nums}
 .fg-note{font-size:12.5px;color:var(--muted);background:var(--sunken);border-radius:6px;padding:8px 12px}
-@media print{.views,header,.fg-in,.fg-det,.fg-src .btn,#fg-tools{display:none!important}}
+@media print{.fg-in,.fg-det,.fg-src .btn{display:none!important}}
+
+.fg-stages{display:flex;flex-direction:column;gap:0}
+.fg-stage{display:grid;grid-template-columns:minmax(150px,240px) minmax(0,1fr);gap:6px 14px;align-items:start;padding:10px 0;border-top:1px solid var(--line)}
+.fg-stage:first-child{border-top:none}
+.fg-stage .fg-step{justify-self:start}
+.fg-evs{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.fg-evc{display:inline-flex;align-items:stretch;border:1px solid var(--accent);border-radius:999px;overflow:hidden;background:var(--accent-soft)}
+.fg-evc.off{border-color:var(--line);background:var(--sunken);opacity:.6}
+.fg-evc.off .tg{text-decoration:line-through}
+.fg-evc button,.fg-evc select{border:none;background:none;font:inherit;font-size:13px;color:var(--ink)}
+.fg-evc .tg{padding:3px 4px 3px 11px}
+.fg-evc select{padding:0 4px;color:var(--accent);cursor:pointer;width:2.2em;appearance:none;-webkit-appearance:none;text-align:center}
+.fg-evc .rm{padding:0 9px 0 2px;color:var(--muted);font-size:15px;line-height:1}
+.fg-evs .add{font-size:12.5px;padding:3px 6px;border-radius:999px;width:auto;max-width:8.5em}
+.fg-none{font-size:12.5px;color:var(--muted)}
+.fg-h3ev{font-size:12.5px;color:var(--muted);font-weight:400;margin-left:8px}
+@media (max-width:640px){.fg-stage{grid-template-columns:minmax(0,1fr)}}
+
+.fg-box{margin-top:12px;padding:14px 16px;border:1px dashed var(--accent);border-radius:10px;background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.fg-box h3{margin:0}
+.fg-box[hidden],.fg-det[hidden]{display:none!important}
+.casetab.fgtab{border-style:dashed}
+.q .fg-src{grid-column:2}
+
+.fg-detd summary{cursor:pointer;font-size:14px;color:var(--accent);display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.fg-detd summary .hint{color:var(--muted)}
+.fg-detd[open] summary{margin-bottom:4px}
+.fg-rel{font-weight:700;color:var(--accent)}
+#fg-n:disabled{opacity:.45}
 </style>
 </head>
 <body>
@@ -275,7 +304,6 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
 </header>
 <nav class="views" aria-label="切換頁面">
   <button type="button" class="viewtab" data-v="q" aria-pressed="true">PFM 評鑑情境查詢</button>
-  <button type="button" class="viewtab" data-v="fg" aria-pressed="false">自由情境出題</button>
   <button type="button" class="viewtab" data-v="spc" aria-pressed="false">管制圖總覽（158 支指標）</button>
   <button type="button" class="viewtab" data-v="ntu" aria-pressed="false">SPC 管制圖分析系統</button>
   <a class="viewtab viewlink" href="search.html" target="_blank" rel="noopener">評鑑基準全文搜尋 ↗</a>
@@ -288,6 +316,28 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
     <h3>個案主題</h3>
     <div class="chips" id="cases" style="margin-top:8px"></div>
     <p class="hint" id="caseintro" style="margin:8px 0 0"></p>
+    <div id="fg-box" class="fg-box" hidden>
+      <h3>輸入臨床情境</h3>
+      <p class="hint" style="margin:4px 0 8px">描述病人從到院到出院的經過，系統會辨識病人流階段與各站的醫療事件，從本站題庫（4 個個案及心導管室、產房、精神科病房單位題組）挑題組成 PFM 題組，可在下方「四」評分。</p>
+      <div class="fg-in">
+        <textarea id="fg-text" placeholder="例如：82 歲女性在家跌倒，119 送急診，CT 顯示髖部骨折合併硬腦膜下出血。急診會診骨科與神經外科，簽署手術同意書後送開刀房，術後轉 SICU，第 2 天出現譫妄並自拔鼻胃管而予以約束；第 5 天轉一般病房，發生泌尿道感染使用抗生素，營養師介入，出院準備轉介居家護理。"></textarea>
+        <div class="tools">
+          <button class="btn pri" id="fg-go" type="button">產生 PFM 問題</button>
+          <button class="btn" id="fg-ex" type="button">填入範例</button>
+          <button class="btn" id="fg-clear" type="button">清除</button>
+          <label for="fg-n">每個階段<select id="fg-n"><option>3</option><option>4</option><option selected>5</option><option>6</option><option>8</option></select>題</label>
+          <label class="fg-rel"><input type="checkbox" id="fg-rel">列出全部相關題（不限題數）</label>
+          <label><input type="checkbox" id="fg-qi" checked>加入跨階段品管題</label>
+        </div>
+      </div>
+      <div id="fg-detp" class="fg-det" hidden>
+        <details id="fg-detd" class="fg-detd"><summary><b>調整辨識結果</b><span class="hint" id="fg-detsum"></span></summary>
+        <p class="hint" style="margin:6px 0 4px">辨識出的病人流路徑與醫療事件已帶入下方「依病人流階段」。若辨識有誤，可在這裡修正：點事件可暫停／恢復，按 ⇄ 移到別站，按 × 移除，或加入階段、事件；下方題組會立即更新。</p>
+        <div id="fg-path" class="fg-stages"></div>
+        <div class="fg-row"><select id="fg-add" aria-label="加入階段"><option value="">＋加入階段</option></select></div>
+        </details>
+      </div>
+    </div>
   </div>
   <div>
     <h3>依病人流階段</h3>
@@ -372,36 +422,6 @@ footer{color:var(--muted);font-size:12.5px;max-width:78ch}
   <p class="st-note">評分與歷史紀錄只存在目前這台電腦的瀏覽器，換電腦或清除瀏覽資料會消失。請定期按「匯出備份檔」保存，換電腦時用「匯入備份檔」還原；也可用「匯出評分明細」留存每次的 CSV。</p>
 </section>
 
-</div>
-<div class="view" id="view-fg" hidden>
-<section class="panel" aria-label="輸入臨床情境">
-  <div class="panel-head"><h2>一、輸入臨床情境</h2><span class="hint">描述病人從到院到出院的經過，系統會辨識病人流階段與醫療事件，從本站題庫重組出 PFM 題組</span></div>
-  <div class="fg-in">
-    <textarea id="fg-text" placeholder="例如：82 歲女性在家跌倒，119 送急診，CT 顯示髖部骨折合併硬腦膜下出血。急診會診骨科與神經外科，簽署手術同意書後送開刀房，術後轉 SICU，第 2 天出現譫妄並自拔鼻胃管而予以約束；第 5 天轉一般病房，發生泌尿道感染使用抗生素，營養師介入，出院準備轉介居家護理。"></textarea>
-    <div class="tools">
-      <button class="btn pri" id="fg-go" type="button">產生 PFM 問題</button>
-      <button class="btn" id="fg-ex" type="button">填入範例</button>
-      <button class="btn" id="fg-clear" type="button">清除</button>
-      <label for="fg-n">每個階段<select id="fg-n"><option>3</option><option>4</option><option selected>5</option><option>6</option><option>8</option></select>題</label>
-      <label><input type="checkbox" id="fg-qi" checked>加入跨階段品管題</label>
-    </div>
-  </div>
-</section>
-<section class="panel" id="fg-detp" hidden aria-label="辨識結果">
-  <div class="panel-head"><h2>二、辨識結果</h2><span class="hint">可移除或加入階段、點選醫療事件開關，題組會立即重新產生</span></div>
-  <div class="fg-det">
-    <div class="fg-row"><span class="lab">病人流路徑</span><span id="fg-path" class="fg-row"></span>
-      <select id="fg-add" aria-label="加入階段"><option value="">＋加入階段</option></select></div>
-    <div class="fg-row"><span class="lab">醫療事件</span><span id="fg-ev" class="chips"></span></div>
-  </div>
-</section>
-<section class="panel" id="fg-outp" hidden aria-label="自動產生的 PFM 題組">
-  <div class="panel-head"><h2>三、PFM 委員提問題組</h2>
-    <span id="fg-tools"><span id="fg-msg" role="status"></span> <button class="btn" id="fg-copy" type="button">複製題組</button> <button class="btn" id="fg-print" type="button">列印</button></span></div>
-  <div class="fg-sum" id="fg-sum"></div>
-  <p class="fg-note">題目由本站 4 個個案題庫，以及心導管室、產房、精神科病房單位題組依情境挑選重組；題庫未涵蓋的單位（如內視鏡室、血管攝影室、安寧病房）改用通用單位範本代入單位名稱。每題標示出處；個案細節（如年齡、時間、處置名稱）請委員依實際情境口頭調整。條文依據與佐證指標沿用原題。</p>
-  <div id="fg-list"></div>
-</section>
 </div>
 <div class="view" id="view-spc" hidden>
   <section class="panel">
@@ -3334,7 +3354,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 let stageByKey={},homeStage={},indOrder=[],CASE=null;
 const cOrder=Object.keys(D.C);
 D.EVENTS.forEach(e=>{e.rx=e.re?new RegExp(e.re):null});
-function matchEvent(q,e){if(e.cases&&CASE&&!e.cases.includes(CASE.k))return false;return (q.ev&&q.ev.includes(e.k))||e.c.some(c=>q.c.includes(c))||(e.rx&&e.rx.test(q.q))||e.i.some(i=>q.i.includes(i))}
+function matchEvent(q,e){if(e.cases&&CASE&&CASE.k!=='free'&&!e.cases.includes(CASE.k))return false;return (q.ev&&q.ev.includes(e.k))||e.c.some(c=>q.c.includes(c))||(e.rx&&e.rx.test(q.q))||e.i.some(i=>q.i.includes(i))}
 const state={sel:new Set(),role:'',kw:'',focus:null};
 function qEvents(q){return D.EVENTS.filter(e=>matchEvent(q,e))}
 function focusMatch(q,f){if(f.t==='c')return q.c.includes(f.v);if(f.t==='i')return q.i.includes(f.v);if(f.t==='e'){if(f.v==='__none')return !qEvents(q).length;return matchEvent(q,D.EVENTS.find(e=>e.k===f.v))}return true}
@@ -3354,22 +3374,23 @@ function filtered(){
   return qs;
 }
 function setCase(k){
-  CASE=D.CASES.find(c=>c.k===k)||D.CASES[0];D.Q=CASE.Q;D.STAGES=CASE.STAGES;
+  CASE=k==='free'?fgCase():(D.CASES.find(c=>c.k===k)||D.CASES[0]);D.Q=CASE.Q;D.STAGES=CASE.STAGES;
+  $('fg-box').hidden=CASE.k!=='free';
   if(typeof SP!=='undefined')SP.map=CASE.MAP;
   stageByKey=Object.fromEntries(D.STAGES.map((s,i)=>[s.k,Object.assign({idx:i},s)]));
   homeStage={};D.STAGES.forEach(s=>s.i.forEach(i=>{(homeStage[i]=homeStage[i]||[]).push(s.n)}));
   indOrder=[...new Set(D.STAGES.flatMap(s=>s.i))];
   document.querySelectorAll('.casetab').forEach(b=>b.setAttribute('aria-pressed',b.dataset.c===CASE.k));
   $('caseintro').textContent=CASE.intro+'（共 '+D.Q.length+' 題）';
-  $('path').innerHTML=D.STAGES.map((s,i)=>`<button type="button" class="step" data-k="${s.k}" aria-pressed="false"><span class="no">${i<7?'階段 '+(i+1):'跨階段'}</span><span class="nm">${esc(s.n)}</span><span class="ds">${esc(s.d)}</span></button>`).join('');
+  $('path').innerHTML=D.STAGES.map((s,i)=>`<button type="button" class="step" data-k="${s.k}" aria-pressed="false"><span class="no">${stNo(s,i)}</span><span class="nm">${esc(s.n)}</span><span class="ds">${esc(s.d)}</span></button>`).join('');
   $('role').innerHTML='<option value="">全部人員</option>'+[...new Set(D.Q.map(q=>q.role))].map(r=>`<option>${esc(r)}</option>`).join('');
   document.querySelectorAll('#path .step').forEach(b=>b.addEventListener('click',ev=>{const k=b.dataset.k;if(ev.ctrlKey||ev.metaKey){state.sel.has(k)?state.sel.delete(k):state.sel.add(k)}else{const only=state.sel.size===1&&state.sel.has(k);state.sel.clear();if(!only)state.sel.add(k)}state.focus=null;render()}));
-  state.sel=new Set([D.STAGES[0].k]);state.role='';state.kw='';state.focus=null;$('kw').value='';
+  state.sel=new Set();state.role=''; // 切換個案時階段一律未選，由委員自行點選state.kw='';state.focus=null;$('kw').value='';
   if(typeof ps!=='undefined'){ps.ind=null;$('spcpanel').hidden=true}
   render();
 }
 function build(){
-  $('cases').innerHTML=D.CASES.map(c=>`<button type="button" class="chip casetab" data-c="${c.k}" aria-pressed="false">${esc(c.name)}</button>`).join('');
+  $('cases').innerHTML=D.CASES.map(c=>`<button type="button" class="chip casetab" data-c="${c.k}" aria-pressed="false">${esc(c.name)}</button>`).join('')+'<button type="button" class="chip casetab fgtab" data-c="free" aria-pressed="false">✎ 自由輸入情境</button>';
   document.querySelectorAll('.casetab').forEach(b=>b.addEventListener('click',()=>setCase(b.dataset.c)));
   $('role').addEventListener('change',e=>{state.role=e.target.value;render()});
   $('kw').addEventListener('input',e=>{state.kw=e.target.value.trim();render()});
@@ -3458,7 +3479,7 @@ function render(){
   // 提問
   if(!shown.length)$('qlist').innerHTML=msg;else{
     const groups=[];shown.forEach(q=>{const key=q.s+'|'+q.role;let g=groups.find(x=>x.key===key);if(!g){g={key,q:[],s:q.s,role:q.role,rc:q.rc};groups.push(g)}g.q.push(q)});
-    $('qlist').innerHTML=groups.map(g=>`<div class="rolegroup"><div class="rolehead"><h3>${esc(g.role)}</h3><span class="stg">${esc(stageByKey[g.s].idx<7?'階段 '+(stageByKey[g.s].idx+1)+'　'+stageByKey[g.s].n:'跨階段')}　${g.q.length} 題</span></div><div>${g.q.map(q=>`<div class="q${qScoreClass(q)}" data-qid="${q.id}"><div class="qid">${q.id}</div><div class="qtext">${esc(q.q)}</div><dl class="meta"><dt>醫療事件</dt><dd>${(()=>{const ev=qEvents(q);return ev.length?ev.map(e=>`<span class="evtag">${esc(e.n)}</span>`).join(''):'<span class="evtag">未歸類</span>'})()}</dd><dt>條文依據</dt><dd>${refsHTML(q)}</dd><dt>佐證指標</dt><dd>${q.i.length?(q.i.length>8?'七階段全部指標':q.i.map(i=>`<span class="pill ${D.KIND[i]==='過程'?'p':'o'}">${esc(i)}</span>`).join('')):'—'}</dd><dt>佐證資料</dt><dd>${esc(q.e)}</dd></dl>${scoreHTML(q)}</div>`).join('')}</div></div>`).join('');
+    $('qlist').innerHTML=groups.map(g=>`<div class="rolegroup"><div class="rolehead"><h3>${esc(g.role)}</h3><span class="stg">${esc(stNo(stageByKey[g.s],stageByKey[g.s].idx)==='跨階段'?'跨階段':stNo(stageByKey[g.s],stageByKey[g.s].idx)+'　'+stageByKey[g.s].n)}　${g.q.length} 題</span></div><div>${g.q.map(q=>`<div class="q${qScoreClass(q)}" data-qid="${q.id}"><div class="qid">${q.id}</div><div class="qtext">${esc(q.q)}</div><dl class="meta"><dt>醫療事件</dt><dd>${(()=>{const ev=qEvents(q);return ev.length?ev.map(e=>`<span class="evtag">${esc(e.n)}</span>`).join(''):'<span class="evtag">未歸類</span>'})()}</dd><dt>條文依據</dt><dd>${refsHTML(q)}</dd><dt>佐證指標</dt><dd>${q.i.length?(q.i.length>8?'七階段全部指標':q.i.map(i=>`<span class="pill ${D.KIND[i]==='過程'?'p':'o'}">${esc(i)}</span>`).join('')):'—'}</dd><dt>佐證資料</dt><dd>${esc(q.e)}</dd></dl>${q.src?`<div class="fg-src"><span>${esc(q.src)}</span>${q.sw?`<button type="button" class="btn" data-sw="${q.sw}">換一題</button>`:''}</div>`:''}${scoreHTML(q)}</div>`).join('')}</div></div>`).join('');
   }
   window.__shown=shown;
   scoreProgress();renderStats();
@@ -3485,7 +3506,8 @@ function scoreProgress(){
   $('scoreprog').textContent=(SC.on||done)?`已評分 ${done} / ${all.length} 題`:'';
   $('statpanel').hidden=!(SC.on||done||HIST.some(r=>r.caseK===CASE.k));
 }
-function stagesLabel(k){const s=stageByKey[k];return s.idx<7?'階段 '+(s.idx+1)+' '+s.n:(s.n.startsWith('跨階段')?s.n:'跨階段 '+s.n)}
+function stNo(s,i){if(s.cross!==undefined)return s.cross?'跨階段':'階段 '+(i+1);return i<7?'階段 '+(i+1):'跨階段'}
+function stagesLabel(k){const s=stageByKey[k];return stNo(s,s.idx)!=='跨階段'?'階段 '+(s.idx+1)+' '+s.n:(s.n.startsWith('跨階段')?s.n:'跨階段 '+s.n)}
 function agg(list){
   const c={'符合':0,'部分符合':0,'不符合':0,'不適用':0},cs=caseStore().s;
   list.forEach(q=>{const lv=cs[q.id]&&cs[q.id].lv;if(lv)c[lv]++});
@@ -3943,7 +3965,7 @@ function ntuGoOverview(code){
 function ntuFit(){const f=$('ntu-frame');try{const d=f.contentDocument;if(d&&d.body){const h=Math.ceil(d.body.getBoundingClientRect().height);if(h>0)f.style.height=h+'px'}}catch(e){}}
 function ntuShow(){const f=$('ntu-frame');try{const w=f.contentWindow;if(w&&typeof w.recalculateAndRender==='function')w.recalculateAndRender()}catch(e){}ntuFit()}
 function initNtu(){const f=$('ntu-frame');const hook=()=>{try{const w=f.contentWindow;if(w&&typeof w.setIndicatorCatalog==='function')w.setIndicatorCatalog(ntuCatalog());if(ntuPending&&w&&typeof w.loadExternalIndicator==='function'){w.loadExternalIndicator(ntuPending);ntuPending=null}}catch(e){}try{const d=f.contentDocument;if(window.ResizeObserver&&d&&d.body)new ResizeObserver(ntuFit).observe(d.body);}catch(e){}if(!$('view-ntu').hidden)ntuShow();else ntuFit()};if(f.contentDocument&&f.contentDocument.readyState==='complete'&&f.contentDocument.body&&f.contentDocument.body.childElementCount)hook();else f.addEventListener('load',hook)}
-function setView(v){if(!['q','fg','spc','ntu'].includes(v))v='q';try{history.replaceState(null,'',v==='q'?location.pathname+location.search:'#'+v)}catch(e){}document.querySelectorAll('.viewtab').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));$('view-q').hidden=v!=='q';$('view-fg').hidden=v!=='fg';$('view-spc').hidden=v!=='spc';$('view-ntu').hidden=v!=='ntu';if(v==='spc')renderOverview();else if(v==='ntu')ntuShow();else if(ps.ind)renderPfmChart()}
+function setView(v){if(v==='fg'){v='q';setTimeout(()=>setCase('free'),0)}if(!['q','spc','ntu'].includes(v))v='q';try{history.replaceState(null,'',v==='q'?location.pathname+location.search:'#'+v)}catch(e){}document.querySelectorAll('.viewtab').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));$('view-q').hidden=v!=='q';$('view-spc').hidden=v!=='spc';$('view-ntu').hidden=v!=='ntu';if(v==='spc')renderOverview();else if(v==='ntu')ntuShow();else if(ps.ind)renderPfmChart()}
 function initSpc(){
   $('inds').addEventListener('click',e=>{const b=e.target.closest('.spcbtn');if(b){e.stopPropagation();openInd(b.dataset.i)}});
   $('spc-codes').addEventListener('click',e=>{const b=e.target.closest('[data-code]');if(b){ps.code=b.dataset.code;renderPfmChart()}});
@@ -3993,7 +4015,7 @@ const UT={ // 病人流階段類型：名稱、辨識關鍵字
   qi:{n:'跨階段品管',re:/$^/g}
 };
 const ST_TYPE={trauma:{s1:'er',s2:'or',s3:'icu',s4:'ward',s5:'icu',s6:'rcc',s7:'dc',s8:'qi'},dialysis:{d1:'er',d2:'icu',d3:'img',d4:'ward',d5:'hd',d6:'or',d7:'dc',d8:'qi'},cpoe:{c1:'med',c2:'med',c3:'med',c4:'med',c5:'med',c6:'med',c7:'med',c8:'qi'},ent:{e1:'er',e2:'er',e3:'icu',e4:'or',e5:'icu',e6:'ward',e7:'dc',e8:'qi'}};
-const EV_KW={consent:/同意書|知情同意|簽署|告知/,ident:/辨識|手術安全|time-?out|清點|檢體|部位標記/i,handoff:/交班|交接|轉送|轉床|轉入|轉出|轉至|轉到/,deterio:/惡化|急救|CPR|心跳停止|插管|休克|RRT|OHCA|IHCA/i,airway:/口腔出血|呼吸道|吐血|咳血|呼吸道阻塞/,reicu:/重返|再次入住|轉回(加護|ICU)/i,tube:/管路|自拔|滑脫|鼻胃管|導尿管|CVC|中心靜脈|引流管/i,fall:/跌倒/,pi:/壓傷|壓瘡|褥瘡/,restraint:/約束|躁動|譫妄/,hai:/感染|敗血|發燒|肺炎|VAP|CLABSI|CAUTI|SSI|BSI|泌尿道|隔離/i,abx:/抗生素|抗菌|培養/,med:/用藥|藥物|給藥|自備藥|高警訊|胰島素|抗凝|藥事|藥師/,cpoe:/醫囑|CPOE|警示|CDS/i,blood:/輸血|出血|血庫/,crit:/危急值|異常值|報告/,consult:/會診/,vent:/呼吸器|脫離|拔管|氣切/,family:/家屬|家庭會議|共享決策|SDM|病情說明/i,onco:/癌|腫瘤|惡性/,discharge:/出院|轉院|轉介|長照|居家|返家/,order:/口頭醫囑|電話醫囑/,record:/病歷|紀錄/,mci:/大量傷患|MCI/,staff:/人力|證照|年資/,equip:/急救車|儀器|設備|AED/i,qi:/指標|品質/,dialysis:/透析|洗腎|腎衰竭|末期腎|CKD|ESRD|eGFR/i,imaging:/電腦斷層|CT|MRI|顯影|影像/,nutrition:/營養|管灌|進食|體重/,edu:/衛教|戒菸|吸菸/,alertfat:/警示疲勞/,drugchk:/過敏|劑量|腎功能|eGFR/i,aicds:/AI|人工智慧/,cdsgov:/CDS 委員會|警示下架/,itchange:/上線|系統變更/};
+const EV_KW={consent:/同意書|知情同意|簽署|告知/,ident:/辨識|手術安全|time-?out|清點|檢體|部位標記/i,handoff:/交班|交接|轉送|轉床|轉入|轉出|轉至|轉到/,deterio:/惡化|急救|CPR|心跳停止|插管|休克|RRT|OHCA|IHCA/i,airway:/口腔出血|呼吸道|吐血|咳血|呼吸道阻塞/,reicu:/重返|再次入住|轉回(加護|ICU)/i,tube:/管路|自拔|滑脫|鼻胃管|導尿管|CVC|中心靜脈|引流管/i,fall:/跌倒/,pi:/壓傷|壓瘡|褥瘡/,restraint:/約束|躁動|譫妄/,hai:/感染|敗血|發燒|肺炎|VAP|CLABSI|CAUTI|SSI|BSI|泌尿道|隔離/i,abx:/抗生素|抗菌|培養/,med:/用藥|藥物|給藥|自備藥|高警訊|胰島素|抗凝|藥事|藥師/,cpoe:/醫囑|CPOE|警示|CDS/i,blood:/輸血|大出血|大量出血|血庫|血品/,crit:/危急值|異常值|報告/,consult:/會診/,vent:/呼吸器|脫離|拔管|氣切/,family:/家屬|家庭會議|共享決策|SDM|病情說明/i,onco:/癌|腫瘤|惡性/,discharge:/出院|轉院|轉介|長照|居家|返家/,order:/口頭醫囑|電話醫囑/,record:/病歷|紀錄/,mci:/大量傷患|MCI/,staff:/人力|證照|年資/,equip:/急救車|儀器|設備|AED/i,qi:/指標|品質/,dialysis:/透析|洗腎|腎衰竭|末期腎|CKD|ESRD|eGFR/i,imaging:/電腦斷層|CT|MRI|顯影|影像/,nutrition:/營養|管灌|進食|體重/,edu:/衛教|戒菸|吸菸/,alertfat:/警示疲勞/,drugchk:/過敏|劑量|腎功能|eGFR/i,aicds:/AI|人工智慧/,cdsgov:/CDS 委員會|警示下架/,itchange:/上線|系統變更/};
 const SPEC=[['重返','再插管'],['加護','ICU'],['急診停留','急診等候'],['車禍','外傷','119'],['30 分鐘內'],['心跳停止','CPR','恢復心跳'],['肺炎'],['緊急透析','腎衰竭'],['旅遊史'],['肺水腫'],['腹膜','PD 導管','PD'],['透析','洗腎'],['腫瘤','癌','惡性','病理'],['口腔','顎'],['Bosmin','紗布'],['氣切','氣管切開'],['切片'],['吐血'],['RCC'],['eGFR','腎功能'],['降血糖'],['出疹'],['9B'],['12B'],['戒菸'],['電腦斷層','CT','顯影'],['心肌酵素','心臟內科']];
 const ROLE_SPEC={'耳鼻喉科':/耳鼻喉|ENT|口腔|喉/,'腎臟科':/腎/,'透析':/透析|洗腎/,'放射':/CT|電腦斷層|MRI|影像|X光|攝影|放射|心導管|導管室|顯影/,'RCC':/RCC|呼吸照護/,'戒菸':/菸/,'CDS':/CDS|CPOE|醫囑|警示/,'資訊':/CDS|CPOE|資訊|系統/,'高風險手術':/高風險/,'呼吸治療':/呼吸|氧|插管|呼吸器|氣切|肺/};
 const FG_EX='82 歲女性在家跌倒，119 送急診，CT 顯示髖部骨折合併硬腦膜下出血。急診會診骨科與神經外科，向家屬說明病情並簽署手術同意書後送開刀房，術後轉 SICU。第 2 天出現譫妄並自拔鼻胃管，予以約束；第 5 天轉一般病房，發生泌尿道感染使用抗生素，營養師介入，出院準備轉介居家護理。';
@@ -4006,22 +4028,31 @@ function fgPath(text){ // 依文字出現順序排出病人流路徑
   const hits=[];Object.entries(UT).forEach(([k,u])=>{if(k==='qi')return;u.re.lastIndex=0;let m;while((m=u.re.exec(text))){hits.push({k,i:m.index,w:m[0]});if(!u.re.global)break}});
   // 「病房」若緊接在加護等字樣內則略過；「手術」在「術後」前後都視為開刀房
   hits.sort((a,b)=>a.i-b.i||b.w.length-a.w.length||(a.k==='icu'?-1:1));
-  const path=[];let lastEnd=-1;
-  hits.forEach(h=>{if(h.i<lastEnd)return;lastEnd=h.i+h.w.length;const p=path[path.length-1];if(h.k==='gen'){if(!path.some(x=>x.k==='gen'&&x.w===h.w))path.push({k:'gen',w:h.w});return}if(p&&p.k===h.k)return;
-    if(h.k==='dc'&&path.some(x=>x.k==='dc'))return; // 出院與多團隊只放一次（放最後）
-    if(path.some(x=>x.k===h.k)&&!(h.k==='icu'||(h.k==='or'&&/重返手術|再次手術|再手術/.test(text))))return; // 只有重返加護、再次手術可重複
-    if(path.filter(x=>x.k===h.k).length>=2)return;
-    path.push({k:h.k,w:h.w})});
+  const path=[],anc=[];let lastEnd=-1;
+  const lastOf=(k,w)=>{for(let i=path.length-1;i>=0;i--)if(path[i].k===k&&(k!=='gen'||path[i].w===w))return path[i]};
+  const add=(h,p)=>{if(!p){p={k:h.k,w:h.w,ev:[]};path.push(p)}anc.push({pos:h.i,p})};
+  hits.forEach(h=>{if(h.i<lastEnd)return;lastEnd=h.i+h.w.length;const p=path[path.length-1];if(h.k==='gen'){add(h,lastOf('gen',h.w));return}if(p&&p.k===h.k){add(h,p);return}
+    if(h.k==='dc'&&path.some(x=>x.k==='dc')){add(h,lastOf('dc'));return} // 出院與多團隊只放一次（放最後）
+    if(path.some(x=>x.k===h.k)&&!(h.k==='icu'||(h.k==='or'&&/重返手術|再次手術|再手術/.test(text)))){add(h,lastOf(h.k));return} // 只有重返加護、再次手術可重複
+    if(path.filter(x=>x.k===h.k).length>=2){add(h,lastOf(h.k));return}
+    add(h,null)});
+  FG.anc=anc;
   const dc=path.findIndex(x=>x.k==='dc');if(dc>-1&&dc<path.length-1)path.push(path.splice(dc,1)[0]);
   return path.slice(0,10);
 }
-function fgEvents(text){return new Set(D.EVENTS.filter(e=>EV_KW[e.k]&&EV_KW[e.k].test(text)).map(e=>e.k))}
+function fgAssign(text,path){ // 每個事件歸到原文中它前面最近出現的那一站
+  path.forEach(p=>p.ev=[]);if(!path.length)return;
+  const anc=(FG.anc||[]).filter(a=>path.includes(a.p)).sort((a,b)=>a.pos-b.pos);
+  D.EVENTS.forEach(e=>{const re=EV_KW[e.k];if(!re)return;const g=new RegExp(re.source,re.flags.replace('g','')+'g');let m;
+    while((m=g.exec(text))){if(!m[0].length){g.lastIndex++;continue}let p=anc.length?anc[0].p:path[0];anc.forEach(a=>{if(a.pos<=m.index)p=a.p});if(!p.ev.some(x=>x.k===e.k))p.ev.push({k:e.k,on:true})}});
+}
+const evName=k=>(D.EVENTS.find(e=>e.k===k)||{n:k}).n;
 function fgQEv(x){return D.EVENTS.filter(e=>{if(e.cases&&!e.cases.includes(x.cs.k))return false;const q=x.q;return (q.ev&&q.ev.includes(e.k))||e.c.some(c=>q.c.includes(c))||(e.re&&new RegExp(e.re).test(q.q))||e.i.some(i=>q.i.includes(i))}).map(e=>e.k)}
 FGQ.forEach(x=>x.ev=fgQEv(x));
 function fgScore(x,ctx,occ){
-  const evOn=[...FG.ev].filter(k=>!FG.evOff.has(k));
-  const evHit=x.ev.filter(k=>evOn.includes(k));
-  let s=1+evHit.length*3;
+  const here=ctx.here||[],other=ctx.other||[];
+  const evHit=x.ev.filter(k=>here.includes(k));
+  let s=1+evHit.length*3+x.ev.filter(k=>!here.includes(k)&&other.includes(k)).length*0.5;
   let ov=0;x.bg.forEach(b=>{if(ctx.bg.has(b))ov++});s+=Math.min(ov,12)*0.4;
   let pen=0;SPEC.forEach(g=>{if(g.some(w=>x.q.q.includes(w))&&!g.some(w=>ctx.text.includes(w)))pen++});
   const rk=Object.keys(ROLE_SPEC).find(r=>x.q.role.includes(r));if(rk&&!ROLE_SPEC[rk].test(ctx.text))pen++;
@@ -4037,48 +4068,59 @@ function fgPick(type,occ,ctx,n,used){
   const cand=FGQ.filter(x=>x.t===type&&!used.has(x.q.id+(type==='gen'?'|'+ctx.u:''))).map(x=>Object.assign({x},fgScore(x,ctx,occ))).sort((a,b)=>b.s-a.s);
   const out=[],roles={};
   const pool=cand.slice();
-  while(out.length<n&&pool.length){
+  const rel=n==='rel',skip=[]; // 全部相關：列出相關度≥2 的題目，至少 3 題
+  while((rel||out.length<n)&&pool.length){
     pool.forEach(c=>c.adj=c.s-(roles[c.x.q.role]||0)*1.5);
     pool.sort((a,b)=>b.adj-a.adj);
     const c=pool.shift();
     if(out.some(o=>jac(o.x.bg,c.x.bg)>0.45))continue;
+    if(rel&&c.s<2&&out.length>=3){skip.push(c);continue}
     out.push(c);roles[c.x.q.role]=(roles[c.x.q.role]||0)+1;used.add(c.x.q.id+(type==='gen'?'|'+ctx.u:''));
   }
-  return {out,rest:pool.filter(c=>!out.includes(c))};
+  return {out,rest:pool.concat(skip).filter(c=>!out.includes(c))};
 }
 function fgBuild(){
-  const text=FG.text,ctx={text,bg:bigr(text)},n=+$('fg-n').value,used=new Set();
-  const steps=FG.path.slice();if($('fg-qi').checked&&!steps.some(p=>p.k==='qi'))steps.push({k:'qi',w:''});
+  const text=FG.text,ctx={text,bg:bigr(text)},n=$('fg-rel').checked?'rel':+$('fg-n').value,used=new Set();
+  const steps=FG.path.slice();if($('fg-qi').checked&&!steps.some(p=>p.k==='qi'))steps.push({k:'qi',w:'',ev:[]});
   const occ={};
-  FG.res=steps.map((p,i)=>{const o=occ[p.k]=(occ[p.k]===undefined?0:occ[p.k]+1);ctx.u=p.w;const r=fgPick(p.k,o,ctx,p.k==='qi'?Math.min(n,3):n,used);return Object.assign({p,i},r)});
-  fgRender();
+  const onEv=p=>(p.ev||[]).filter(x=>x.on).map(x=>x.k);const allOn=[...new Set(FG.path.flatMap(onEv))];
+  FG.res=steps.map((p,i)=>{const o=occ[p.k]=(occ[p.k]===undefined?0:occ[p.k]+1);ctx.u=p.w;ctx.here=p.k==='qi'?allOn:onEv(p);ctx.other=allOn;const r=fgPick(p.k,o,ctx,n==='rel'?'rel':(p.k==='qi'?Math.min(n,3):n),used);return Object.assign({p,i},r)});
+  fgApply(false);
 }
 const fu=(t,r)=>String(t).replace(/\{u\}/g,r&&r.p&&r.p.w?r.p.w:'該單位');
 function fgLabel(p){if(p.k==='gen')return p.w||'其他單位';const u=UT[p.k];return u.n+(p.w&&!u.n.includes(p.w)&&p.k!=='dc'&&p.k!=='or'?'（'+p.w+'）':'')}
 function fgRenderDet(){
-  $('fg-path').innerHTML=FG.path.map((p,i)=>(i?'<span class="fg-arrow">→</span>':'')+`<span class="fg-step"><span class="no">${i+1}</span>${esc(fgLabel(p))}<button type="button" data-rm="${i}" aria-label="移除 ${esc(fgLabel(p))}">×</button></span>`).join('')||'<span class="hint">未辨識到階段，請由右側加入</span>';
+  {const ne=FG.path.reduce((a,p)=>a+p.ev.filter(x=>x.on).length,0);$('fg-detsum').textContent=`（${FG.path.length} 站、${ne} 個醫療事件；辨識有誤時展開修正）`}
   const all=D.EVENTS.filter(e=>FGQ.some(x=>x.ev.includes(e.k)));
-  $('fg-ev').innerHTML=all.filter(e=>FG.ev.has(e.k)).map(e=>`<button type="button" class="chip" data-ev="${e.k}" aria-pressed="${!FG.evOff.has(e.k)}">${esc(e.n)}</button>`).join('')+
-    `<select id="fg-evadd" aria-label="加入醫療事件"><option value="">＋加入事件</option>${all.filter(e=>!FG.ev.has(e.k)).map(e=>`<option value="${e.k}">${esc(e.n)}</option>`).join('')}</select>`;
-  $('fg-evadd').addEventListener('change',e=>{if(e.target.value){FG.ev.add(e.target.value);fgRenderDet();fgBuild()}});
+  const opts=(si)=>FG.path.map((p,j)=>j===si?'':`<option value="${j}">移到 ${j+1} ${esc(fgLabel(p))}</option>`).join('');
+  $('fg-path').innerHTML=FG.path.length?FG.path.map((p,si)=>`<div class="fg-stage"><span class="fg-step"><span class="no">${si+1}</span>${esc(fgLabel(p))}<button type="button" data-rm="${si}" aria-label="移除 ${esc(fgLabel(p))}">×</button></span><div class="fg-evs">${p.ev.length?p.ev.map((x,ei)=>`<span class="fg-evc${x.on?'':' off'}"><button type="button" class="tg" data-tg="${si}|${ei}" aria-pressed="${x.on}" title="點選暫停／恢復">${esc(evName(x.k))}</button>${FG.path.length>1?`<select data-mv="${si}|${ei}" aria-label="把「${esc(evName(x.k))}」移到其他站" title="移到其他站"><option value="">⇄</option>${opts(si)}</select>`:''}<button type="button" class="rm" data-dl="${si}|${ei}" aria-label="移除「${esc(evName(x.k))}」">×</button></span>`).join(''):'<span class="fg-none">此站未辨識到醫療事件</span>'}<select class="add" data-ad="${si}" aria-label="在第 ${si+1} 站加入醫療事件"><option value="">＋事件</option>${all.filter(e=>!p.ev.some(x=>x.k===e.k)).map(e=>`<option value="${e.k}">${esc(e.n)}</option>`).join('')}</select></div></div>`).join(''):'<span class="hint">未辨識到階段，請由下方加入</span>';
 }
-function fgRender(){
-  $('fg-detp').hidden=false;$('fg-outp').hidden=false;
-  const all=FG.res.flatMap(r=>r.out);
-  const cs=new Set(all.flatMap(c=>c.x.q.c)),inds=new Set(all.flatMap(c=>c.x.q.i)),roles=new Set(all.map(c=>c.x.q.role));
-  $('fg-sum').innerHTML=`<span><b>${FG.res.length}</b> 個階段</span><span><b>${all.length}</b> 題委員提問</span><span><b>${cs.size}</b> 條評鑑條文</span><span><b>${inds.size}</b> 項佐證指標</span><span><b>${roles.size}</b> 類受訪人員</span>`;
-  const evName=k=>(D.EVENTS.find(e=>e.k===k)||{n:k}).n;
-  $('fg-list').innerHTML=FG.res.map((r,si)=>`<div class="fg-sec"><div class="rolehead"><h3>${r.p.k==='qi'?'跨階段':'階段 '+(si+1)}　${esc(fgLabel(r.p))}</h3><span class="stg">${r.out.length} 題</span></div>${r.out.length?r.out.map((c,qi)=>{const q=c.x.q;return `<div class="q"><div class="qid">${esc(fu(q.role,r))}</div><div class="qtext">${esc(fu(q.q,r))}</div><dl class="meta"><dt>醫療事件</dt><dd>${c.x.ev.length?c.x.ev.map(k=>`<span class="evtag">${esc(evName(k))}</span>`).join(''):'—'}</dd><dt>條文依據</dt><dd>${refsHTML(q)}</dd><dt>佐證指標</dt><dd>${q.i.length?(q.i.length>8?'七階段全部指標':q.i.map(i=>`<span class="pill ${D.KIND[i]==='過程'?'p':'o'}">${esc(i)}</span>`).join('')):'—'}</dd><dt>佐證資料</dt><dd>${esc(fu(q.e,r))}</dd></dl><div class="fg-src"><span>${c.x.unit?'出自：'+esc(c.x.cs.name):'改寫自：'+esc(c.x.cs.name)+'　'+esc(q.id)+'（'+esc(c.x.st.n)+'）'}</span>${c.evHit.length?`<span class="fg-why">符合情境事件：${c.evHit.map(evName).map(esc).join('、')}</span>`:''}${r.rest.length?`<button type="button" class="btn" data-sw="${si}|${qi}">換一題</button>`:''}</div></div>`}).join(''):'<p class="empty">題庫中沒有此階段的題目。</p>'}</div>`).join('');
+let FREE=null;
+function fgCase(){
+  if(FREE)return FREE;
+  return {k:'free',name:'自由輸入情境',intro:'請在下方輸入臨床情境，按「產生 PFM 問題」',STAGES:[{k:'f1',n:'尚未輸入情境',d:'請先輸入臨床情境',i:[],cross:false}],Q:[],MAP:{}};
 }
-function fgText(){
-  return '【臨床情境】\n'+FG.text+'\n\n【病人流路徑】'+FG.path.map(fgLabel).join(' → ')+'\n\n'+FG.res.map((r,si)=>`■ ${r.p.k==='qi'?'跨階段':'階段 '+(si+1)} ${fgLabel(r.p)}\n`+r.out.map((c,i)=>{const q=c.x.q;return `${i+1}. 〔${fu(q.role,r)}〕${fu(q.q,r)}\n　條文依據：${refsText(q)}\n　佐證指標：${q.i.join('、')||'—'}\n　佐證資料：${fu(q.e,r)}`}).join('\n')).join('\n\n');
+function fgMakeCase(){
+  const MAP=Object.assign({},...D.CASES.map(c=>c.MAP||{}));
+  const STAGES=FG.res.map((r,si)=>{const ev=(r.p.ev||[]).filter(x=>x.on).map(x=>evName(x.k));return {k:'f'+(si+1),n:fgLabel(r.p),d:ev.length?ev.join('、'):(r.p.k==='qi'?'跨階段品質指標監測':'—'),i:[...new Set(r.out.flatMap(c=>c.x.q.i.length>8?[]:c.x.q.i))],cross:r.p.k==='qi'}});
+  const Q=FG.res.flatMap((r,si)=>r.out.map((c,qi)=>{const q=c.x.q;return Object.assign({},q,{id:'F'+(si+1)+'-'+q.id,s:'f'+(si+1),role:fu(q.role,r),q:fu(q.q,r),e:fu(q.e,r),ev:c.x.ev,src:c.x.unit?'出自：'+c.x.cs.name:'改寫自：'+c.x.cs.name+'　'+q.id+'（'+c.x.st.n+'）',sw:r.rest.length?si+'|'+qi:''})}));
+  const t=FG.text.length>60?FG.text.slice(0,60)+'…':FG.text;
+  FREE={k:'free',name:'自由輸入情境',intro:'自由情境：'+t,STAGES,Q,MAP};
+}
+function fgApply(keep){
+  fgMakeCase();
+  if(!CASE||CASE.k!=='free')return;
+  const st=keep?{sel:new Set(state.sel),role:state.role,kw:state.kw,focus:state.focus}:null;
+  setCase('free');
+  if(st){Object.assign(state,st);$('kw').value=st.kw;$('role').value=st.role}
+  render();
 }
 function fgRun(){
   FG.text=$('fg-text').value.trim();
-  if(!FG.text){$('fg-detp').hidden=true;$('fg-outp').hidden=true;return}
+  if(!FG.text){$('fg-detp').hidden=true;FREE=null;if(CASE&&CASE.k==='free')setCase('free');return}
   try{localStorage.setItem('pfm-fg-text',FG.text)}catch(e){}
-  FG.path=fgPath(FG.text);FG.ev=fgEvents(FG.text);FG.evOff=new Set();
-  fgRenderDet();fgBuild();
+  FG.path=fgPath(FG.text);fgAssign(FG.text,FG.path);
+  $('fg-detp').hidden=false;$('fg-detd').open=false;fgRenderDet();fgBuild();
 }
 function initFg(){
   $('fg-add').insertAdjacentHTML('beforeend',Object.entries(UT).filter(([k])=>k!=='qi'&&k!=='gen').map(([k,u])=>`<option value="${k}">${esc(u.n)}</option>`).join(''));
@@ -4088,13 +4130,21 @@ function initFg(){
   $('fg-ex').addEventListener('click',()=>{$('fg-text').value=FG_EX;fgRun()});
   $('fg-clear').addEventListener('click',()=>{$('fg-text').value='';try{localStorage.removeItem('pfm-fg-text')}catch(e){}fgRun();$('fg-text').focus()});
   $('fg-n').addEventListener('change',()=>{if(FG.text)fgBuild()});
+  $('fg-rel').addEventListener('change',e=>{$('fg-n').disabled=e.target.checked;if(FG.text)fgBuild()});
   $('fg-qi').addEventListener('change',()=>{if(FG.text)fgBuild()});
-  $('fg-add').addEventListener('change',e=>{const k=e.target.value;if(!k)return;const dc=FG.path.findIndex(p=>p.k==='dc');const p={k,w:''};if(k!=='dc'&&dc>-1)FG.path.splice(dc,0,p);else FG.path.push(p);e.target.value='';fgRenderDet();fgBuild()});
-  $('fg-path').addEventListener('click',e=>{const b=e.target.closest('[data-rm]');if(b){FG.path.splice(+b.dataset.rm,1);fgRenderDet();fgBuild()}});
-  $('fg-ev').addEventListener('click',e=>{const b=e.target.closest('[data-ev]');if(b){const k=b.dataset.ev;FG.evOff.has(k)?FG.evOff.delete(k):FG.evOff.add(k);fgRenderDet();fgBuild()}});
-  $('fg-list').addEventListener('click',e=>{const b=e.target.closest('[data-sw]');if(!b)return;const [si,qi]=b.dataset.sw.split('|').map(Number);const r=FG.res[si];if(!r.rest.length)return;const nx=r.rest.shift();r.rest.push(r.out[qi]);r.out[qi]=nx;fgRender()});
-  $('fg-copy').addEventListener('click',()=>{const t=fgText();const ok=()=>{$('fg-msg').textContent='已複製';setTimeout(()=>$('fg-msg').textContent='',2000)};if(navigator.clipboard)navigator.clipboard.writeText(t).then(ok,()=>{});else{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();ok()}});
-  $('fg-print').addEventListener('click',()=>window.print());
+  $('fg-add').addEventListener('change',e=>{const k=e.target.value;if(!k)return;const dc=FG.path.findIndex(p=>p.k==='dc');const p={k,w:'',ev:[]};if(k!=='dc'&&dc>-1)FG.path.splice(dc,0,p);else FG.path.push(p);e.target.value='';fgRenderDet();fgBuild()});
+  const upd=()=>{fgRenderDet();fgBuild()};
+  const merge=(p,x)=>{const y=p.ev.find(z=>z.k===x.k);if(y)y.on=y.on||x.on;else p.ev.push(x)};
+  $('fg-path').addEventListener('click',e=>{
+    const r=e.target.closest('[data-rm]');if(r){const i=+r.dataset.rm,p=FG.path[i],to=FG.path[i-1]||FG.path[i+1];if(to)p.ev.forEach(x=>merge(to,x));FG.path.splice(i,1);upd();return} // 移除站別時，事件併入前一站
+    const t=e.target.closest('[data-tg]');if(t){const [si,ei]=t.dataset.tg.split('|').map(Number);const x=FG.path[si].ev[ei];x.on=!x.on;upd();return}
+    const d=e.target.closest('[data-dl]');if(d){const [si,ei]=d.dataset.dl.split('|').map(Number);FG.path[si].ev.splice(ei,1);upd()}
+  });
+  $('fg-path').addEventListener('change',e=>{
+    const m=e.target.closest('[data-mv]');if(m&&m.value!==''){const [si,ei]=m.dataset.mv.split('|').map(Number);const x=FG.path[si].ev.splice(ei,1)[0];merge(FG.path[+m.value],x);upd();return}
+    const a=e.target.closest('[data-ad]');if(a&&a.value){FG.path[+a.dataset.ad].ev.push({k:a.value,on:true});upd()}
+  });
+  $('qlist').addEventListener('click',e=>{const b=e.target.closest('[data-sw]');if(!b||!FG.res)return;const [si,qi]=b.dataset.sw.split('|').map(Number);const r=FG.res[si];if(!r||!r.rest.length)return;const nx=r.rest.shift();r.rest.push(r.out[qi]);r.out[qi]=nx;fgApply(true)});
 }
 build();initSpc();initNtu();initFg();setCase(D.CASES[0].k);if(['#fg','#spc','#ntu'].includes(location.hash))setView(location.hash.slice(1));window.addEventListener('hashchange',()=>setView(location.hash.slice(1)||'q'));
 </script>
