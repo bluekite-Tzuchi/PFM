@@ -3439,6 +3439,7 @@ function renderRoles(){
   document.querySelectorAll('#roles .chip').forEach(b=>b.addEventListener('click',()=>{const r=b.dataset.r;state.role=state.role===r?'':r;$('role').value=state.role;state.focus=null;render()}));
 }
 function render(){
+  if(SC.on)scBeginCase();
   document.querySelectorAll('#path .step').forEach(b=>b.setAttribute('aria-pressed',state.sel.has(b.dataset.k)));
   const qs=filtered();
   renderRoles();
@@ -3498,6 +3499,27 @@ let scSaveOk=true;
 function scSave(){try{localStorage.setItem(SKEY,JSON.stringify(SC.store));scSaveOk=true}catch(e){scSaveOk=false}}
 function caseStore(){const k=CASE.k;return SC.store.c[k]=SC.store.c[k]||{meta:{},s:{}}}
 const qScore=q=>(caseStore().s[q.id]||{});
+/* 重新評分：每次「開始評分」時，先把前次評分自動存成歷史紀錄，再清空選項 */
+SC.fresh=new Set();SC.pristine=null;
+function scMsg(t){const m=$('copymsg');if(!m)return;m.textContent=t;clearTimeout(scMsg.t);scMsg.t=setTimeout(()=>{if(m.textContent===t)m.textContent=''},8000)}
+function scSig(sc){return JSON.stringify(Object.keys(sc).sort().map(k=>[k,sc[k].lv||'',sc[k].note||'']))}
+function scArchive(){
+  const cs=caseStore(),sc={};Object.entries(cs.s).forEach(([k,v])=>{if(v&&(v.lv||v.note))sc[k]={lv:v.lv||'',note:v.note||''}});
+  if(!Object.values(sc).some(v=>v.lv))return 0;
+  const sig=scSig(sc);
+  if(HIST.some(r=>r.caseK===CASE.k&&scSig(r.scores)===sig))return -1;
+  HIST.push({id:'h'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),caseK:CASE.k,caseName:CASE.name,savedAt:new Date().toISOString(),meta:{date:cs.meta.date||new Date().toISOString().slice(0,10),unit:cs.meta.unit||'',who:cs.meta.who||''},scores:sc,auto:true});
+  return hSave()?1:-2;
+}
+function scBeginCase(){
+  const k=CASE.k;if(SC.fresh.has(k))return;SC.fresh.add(k);
+  if(SC.pristine===k){scMsg('已載入歷史紀錄，可直接修改評分');return}
+  const cs=caseStore();if(!Object.values(cs.s).some(v=>v&&v.lv))return;
+  const r=scArchive();
+  if(r===-2){SC.fresh.delete(k);SC.on=false;const b=$('scoremode');b.setAttribute('aria-pressed',false);b.textContent='開始評分';scMsg('瀏覽器無法保存前次評分，為避免遺失未自動清除；請先「匯出備份檔」或手動「清除本個案評分」');return}
+  SC.store.c[k]={meta:{},s:{}};scSave();hLoadedId=null;
+  scMsg(r===1?'已清除前次評分(前次結果已自動存入「歷史紀錄」)':'已清除前次評分(前次結果已在「歷史紀錄」中)');
+}
 function qScoreClass(q){const lv=qScore(q).lv;return lv?' sc-'+lv:''}
 function scoreHTML(q){
   if(!SC.on)return '';const st=qScore(q);
@@ -3628,7 +3650,7 @@ function renderHistory(){
   if(!recs.length){box.innerHTML=`<p class="st-empty">「${esc(CASE.name)}」還沒有存過紀錄。評完分後按上方「存成一筆紀錄」，就會出現在這裡。${others?`(其他個案共有 ${others} 筆紀錄)`:''}</p>`;return}
   const head=`<thead><tr><th>稽核日期</th><th>受稽單位</th><th>稽核者</th><th class="num">已評</th>${LVS.map(l=>`<th class="num">${l}</th>`).join('')}<th>儲存時間</th><th>操作</th></tr></thead>`;
   const rows=recs.slice().reverse().map(r=>{const c=hCount(r.scores),n=c['符合']+c['部分符合']+c['不符合']+c['不適用'];
-    return `<tr data-h="${r.id}"${r.id===hLoadedId?' class="cur"':''}><td>${esc(r.meta.date)}</td><td>${esc(r.meta.unit||'—')}</td><td>${esc(r.meta.who||'—')}</td><td class="num">${n}</td>${LVS.map(l=>`<td class="num">${c[l]}</td>`).join('')}<td>${esc(fmtTime(r.savedAt))}</td><td class="act"><button type="button" data-act="load">載入檢視</button><button type="button" data-act="del">刪除</button></td></tr>`}).join('');
+    return `<tr data-h="${r.id}"${r.id===hLoadedId?' class="cur"':''}><td>${esc(r.meta.date)}</td><td>${esc(r.meta.unit||'—')}</td><td>${esc(r.meta.who||'—')}</td><td class="num">${n}</td>${LVS.map(l=>`<td class="num">${c[l]}</td>`).join('')}<td>${esc(fmtTime(r.savedAt))}${r.auto?' <span class="c3">(自動)</span>':''}</td><td class="act"><button type="button" data-act="load">載入檢視</button><button type="button" data-act="del">刪除</button></td></tr>`}).join('');
   let cmp='';
   if(recs.length>=2){
     const last=recs.slice(-6);
@@ -3641,7 +3663,7 @@ function hLoad(id,btn){
   const r=HIST.find(x=>x.id===id);if(!r)return;
   const cs=caseStore();const hasWork=Object.values(cs.s).some(v=>v&&v.lv);
   if(hasWork&&!btn.dataset.armed){btn.dataset.armed='1';btn.textContent='再按一次確認(目前評分會被取代)';setTimeout(()=>{if(btn.isConnected&&btn.dataset.armed){delete btn.dataset.armed;btn.textContent='載入檢視'}},5000);return}
-  SC.store.c[CASE.k]={meta:{...r.meta},s:JSON.parse(JSON.stringify(r.scores))};scSave();hLoadedId=id;
+  SC.store.c[CASE.k]={meta:{...r.meta},s:JSON.parse(JSON.stringify(r.scores))};scSave();hLoadedId=id;SC.pristine=CASE.k;if(SC.on)SC.fresh.add(CASE.k);
   hMsg(`已載入 ${r.meta.date}${r.meta.unit?'｜'+r.meta.unit:''} 的紀錄；修改後若要保留，請再按「存成一筆紀錄」`);
   render();
 }
@@ -3672,12 +3694,12 @@ function initHistory(){
 }
 function initScore(){
   initHistory();
-  $('scoremode').addEventListener('click',()=>{SC.on=!SC.on;const b=$('scoremode');b.setAttribute('aria-pressed',SC.on);b.textContent=SC.on?'結束評分':'開始評分';render()});
+  $('scoremode').addEventListener('click',()=>{SC.on=!SC.on;if(SC.on)SC.fresh.clear();else SC.pristine=null;const b=$('scoremode');b.setAttribute('aria-pressed',SC.on);b.textContent=SC.on?'結束評分':'開始評分';render()});
   $('qlist').addEventListener('click',e=>{const b=e.target.closest('.score button[data-lv]');if(!b)return;const card=b.closest('.q'),id=card.dataset.qid,cs=caseStore().s,st=cs[id]=cs[id]||{};
-    st.lv=st.lv===b.dataset.lv?'':b.dataset.lv;if(!st.lv&&!st.note)delete cs[id];scSave();
+    SC.pristine=null;st.lv=st.lv===b.dataset.lv?'':b.dataset.lv;if(!st.lv&&!st.note)delete cs[id];scSave();
     card.querySelectorAll('.score button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.lv===st.lv));
     card.className='q'+(st.lv?' sc-'+st.lv:'');scoreProgress();renderStats()});
-  let nt;$('qlist').addEventListener('input',e=>{const i=e.target.closest('input[data-note]');if(!i)return;const id=i.closest('.q').dataset.qid,cs=caseStore().s,st=cs[id]=cs[id]||{};st.note=i.value;if(!st.lv&&!st.note)delete cs[id];scSave();clearTimeout(nt);nt=setTimeout(renderStats,400)});
+  let nt;$('qlist').addEventListener('input',e=>{const i=e.target.closest('input[data-note]');if(!i)return;SC.pristine=null;const id=i.closest('.q').dataset.qid,cs=caseStore().s,st=cs[id]=cs[id]||{};st.note=i.value;if(!st.lv&&!st.note)delete cs[id];scSave();clearTimeout(nt);nt=setTimeout(renderStats,400)});
   document.querySelectorAll('.st-meta input').forEach(i=>i.addEventListener('input',()=>{caseStore().meta[i.dataset.m]=i.value;scSave()}));
   $('st-scope').addEventListener('change',renderStats);
   $('st-png').addEventListener('click',stPNG);
